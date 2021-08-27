@@ -3,7 +3,14 @@ node_modules
 vendor
 .htaccess
 
+
 # exclude everything
 public/uploads/carts/*
 # exception to the rule
 !public/uploads/carts/.gitkeep 
+
+# exclude everything
+public/uploads/profiles/*
+# exception to the rule
+!public/uploads/profiles/.gitkeep 
+
