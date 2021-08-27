@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^pharoselenco.com.br$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.pharoselenco.com.br$
+RewriteRule (.*) /pharos/public/$1 [L]
