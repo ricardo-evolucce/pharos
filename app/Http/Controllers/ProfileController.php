@@ -212,6 +212,40 @@ class ProfileController extends Controller
         //
     }
 
+
+
+     public function delete(Request $profile)
+    {
+
+
+        //obtem dados do profile
+        $profileApagado = Profile::find($profile->id);  
+
+        //obtem dados do usuario      
+        $usuarioApagado = User::find($profileApagado->user_id);
+
+
+        $usuarioApagado->delete();
+        $profileApagado->delete();
+
+        Storage::disk('public')->deleteDirectory("/profiles/{$profileApagado->user_id}");
+
+        
+        
+      
+        
+
+        return redirect()->route('profiles.index')
+            ->with('success', 'Agenciado excluido com sucesso!'); 
+        
+
+
+
+
+    }
+
+
+
     public function solicitation()
     {
         $profiles = Profile::with('user')->get();
