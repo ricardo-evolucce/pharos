@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use PDF;
 
 class CartController extends Controller
@@ -204,5 +205,25 @@ class CartController extends Controller
         }
 
         return true;
+    }
+
+      public function delete(Request $cart)
+    {
+
+
+        //obtem dados do carrinho
+        $carrinho = Cart::find($cart->id);  
+        $carrinho->delete();
+
+        Storage::disk('public')->deleteDirectory("/carts/{$cart->id}"); 
+        
+
+        return redirect()->route('carts.index')
+            ->with('success', 'Carrinho excluido com sucesso!'); 
+        
+
+
+
+
     }
 }

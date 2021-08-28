@@ -82,11 +82,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/carts', 'CartController');
     Route::get('/carts/{cart}/preview/{profile}', 'CartController@previewPDF')->name('profile.preview');
     Route::get('/carts/{cart}/send', 'CartController@sendCart')->name('carts.send');
+    Route::post('/carts/delete', 'CartController@delete')->name('carts.delete');
 
     // Profile
     Route::resource('/profiles', 'ProfileController');
     Route::get('/profiles/solicitation', 'ProfileController@solicitation');
     Route::resource('/profiles', 'ProfileController');
+    Route::post('/profiles/delete', 'ProfileController@delete')->name('profiles.delete');
 
     // Skill
     Route::resource('/skills', 'SkillController');

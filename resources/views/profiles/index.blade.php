@@ -86,6 +86,16 @@
                                         <i class="fa fa-pencil-alt"></i>
                                     </a>
                                 </div>
+                                <div class="btn-group">
+                                    <form action="{{ route('profiles.delete') }}" method="POST" onSubmit="return confirm('Apagar todo o cadastro e fotos do agenciado?');">
+                                        @csrf
+                                            <input type="hidden" name="id" value="{{$profile->id}}" />
+                                                <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Apagar" data-placement="left">
+                                                            <i class="fa fa-trash"></i>
+                                                </button>
+                                    </form>
+
+                                </div>
                             </td>
                         </tr>
                         @endforeach

@@ -12,5 +12,4 @@ public/uploads/carts/*
 # exclude everything
 public/uploads/profiles/*
 # exception to the rule
-!public/uploads/profiles/.gitkeep 
-
+!public/uploads/profiles/.gitkeep
