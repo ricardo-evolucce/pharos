@@ -64,7 +64,7 @@
     <div class="container padding-15"> <!-- CONTENT-BEGAN -->
         <div class="row row_default" style="padding: 65px 0;">
             <div class="col-md-5">
-                <img class="agencia-bg" src="<?php echo url( env('APP_PREFIX') . '/images/agencia-bg.jpg' ); ?>" alt="">
+                <img class="agencia-bg" src="{{ URL::to('/') }}/agencia-bg.jpg" alt="">
 
             </div>
             <div class="col-md-7">
@@ -86,7 +86,7 @@
                 <!--  -->
             </div>
             <div class="col-md-8">
-                <div class="foto-default foto1" style="background-image: url('<?php echo url( env('APP_PREFIX') . '/images/inside-agencia3.jpg'); ?>">
+                <div class="foto-default foto1" style="background-image: url('{{ URL::to('/') }}/inside-agencia3.jpg">
                     
                 </div>
             </div>
@@ -102,11 +102,11 @@
         </div>-->
         <div class="row row_default" style="padding-bottom: 65px;">
             <div class="col-md-5">
-                <div class="foto-default foto2" style="background-image: url('<?php echo url( env('APP_PREFIX') . '/images/inside-agencia1.jpg'); ?>">
+                <div class="foto-default foto2" style="background-image: url('{{ URL::to('/') }}/inside-agencia1.jpg">
                 </div>
             </div>
             <div class="col-md-7">
-                <div class="foto-default foto3" style="background-image: url('<?php echo url( env('APP_PREFIX') . '/images/inside-agencia2.jpg'); ?>">
+                <div class="foto-default foto3" style="background-image: url('{{ URL::to('/') }}/inside-agencia2.jpg">
                 </div>
             </div>
         </div>
