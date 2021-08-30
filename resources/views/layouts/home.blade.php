@@ -87,7 +87,7 @@
                     animation-name: pulse;
                 }
                 </style>
-                <img class="animated pulse-infinite"src="{{ asset( '/images/logo.png') }}" alt="PharosElenco" style="margin-top: 10px; height: 145px;position: relative; left: calc(50% - 93px);">
+                <img class="animated pulse-infinite" src="{{ URL::to('/') }}/logo.png" alt="PharosElenco" style="margin-top: 10px; height: 145px;position: relative; left: calc(50% - 93px);">
             </div>
         @include('includes.mainmenu')
 
