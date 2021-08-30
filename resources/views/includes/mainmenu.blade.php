@@ -17,7 +17,7 @@ if(0){
             <div class="row">
                 <div class="col-lg-4 col-md-4 hidden-sm hidden-xs">
                     <a href="{!!route('home')!!}">
-                        <img src="{{ asset( '/images/logo.png') }}" alt="PharosElenco" style="margin-top: 10px; height: 145px;">
+                        <img src="{{ URL::to('/') }}/images/logo.png" alt="PharosElenco" style="margin-top: 10px; height: 145px;">
                     </a>
                 </div>
                 <button type="button" class="menu_mobile_open" style="display: none; z-index: 99; background-color: #d3d3d3; border-radius: 0px 0px 10px 10px;">

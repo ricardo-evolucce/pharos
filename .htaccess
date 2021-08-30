@@ -1,8 +1,3 @@
 RewriteEngine on
 
-RewriteCond %{HTTP_HOST} ^pharoselenco.com.br
-RewriteRule (.*) http://www.pharoselenco.com.br/$1 [R=301,L]
-
-RewriteCond %{HTTP_HOST} ^pharoselenco.com.br$ [NC,OR]
-RewriteCond %{HTTP_HOST} ^www.pharoselenco.com.br$
-RewriteRule (.*) public/$1 [L]
+RewriteRule (.*) http://pharos.local/public/$1 [R=301,L]
