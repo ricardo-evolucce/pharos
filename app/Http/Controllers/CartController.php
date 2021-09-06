@@ -144,6 +144,9 @@ class CartController extends Controller
      */
     private function savePDFPhotos(Cart $cart, $profiles_photos){
         // dd($profiles_photos);
+        var_dump($profiles_photos);
+        exit();
+
         if ($cart->profiles->count() > 0) {
 
             $path = public_path("uploads/carts/{$cart->id}");
