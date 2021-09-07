@@ -62,6 +62,9 @@ class CartController extends Controller
         
         $cart = Cart::create($request->all());
         $cart->profiles()->sync($request->profile_id);
+
+        dd($request->get('fotos'));
+        exit();
         
         $message = "O pedido foi salvo na lista de carrinhos!";
 
