@@ -23,12 +23,21 @@
         </div>
         <div class="col-md-8 col-lg-7 col-xl-9 order-md-0 bg-body-dark">
             <!-- Main Content -->
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <view-cart-create :clients="{{$clients}}" csrf_token="{{csrf_token()}}" action="{{route('carts.store')}}" />
             <!-- END Main Content -->
         </div>
     </div>
     <!-- END Page Content -->
-    
+
 @endsection
 @section('js_after')
 
