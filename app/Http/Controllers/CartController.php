@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManagerStatic as Image;
 use PDF;
 
 class CartController extends Controller
@@ -192,22 +193,35 @@ class CartController extends Controller
             try {
                 $path = public_path("uploads/carts/{$cart->id}");
                 File::makeDirectory($path, 0775, true);
+                // cria diretorio de imgs comprimidas
+                $pathImgCompress = $path."/min/";
+                File::makeDirectory($pathImgCompress, 0775, true);
 
                 foreach ($cart->profiles as $profile) {
                     $name = str_slug($profile->user->name);
-
                     $fotos = $profiles_photos[$profile->user_id];
-                    $foto_principal = array_splice($fotos,0,1)[0]; //sempre a primeira do array
-                    $fotos_grupos = array_chunk(array_splice($fotos,0,4), 2); //recupera apenas 4 fotos
+                    $fotos_grupos = [];
+                    if($fotos){
+                        for ($i=0; $i < count($fotos); $i++) {
+                            $foto = $this->createThumbnail(public_path($fotos[$i]), $pathImgCompress."/img-".$i."-compress.jpg", 200,200);  //sempre a primeira do array
+                            array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
+                        }
+                        $foto_principal =  $fotos_grupos[0]; // foto principal
+                        unset($fotos_grupos[0]); // remove a primeira foto do array
 
-                    PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
+                        PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
+                    }
                 }
             }catch(Exception $e){
                 return redirect()->back()->withInput()->with('error', 'Não foi prosseguir com a solicitação ERRO. Linha: ' . $e->getLine() . ' - Mensagem: ' . $e->getMessage());
             }
         }
     }
-
+    private function createThumbnail($path,$output_file_compress, $width, $height)
+    {
+        $newPath = Image::make($path)->resize($width, $height)->save($output_file_compress);
+        return $newPath;
+    }
     private function savePDF(Cart $cart)
     {
         if ($cart->profiles->count() > 0) {

@@ -162,6 +162,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+        //Image - http://image.intervention.io/getting_started/installation
+        Intervention\Image\ImageServiceProvider::class,
 
     ],
 
