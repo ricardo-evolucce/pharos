@@ -36,21 +36,28 @@
               </div>
               <div class="form-group row">
                 <div class="col-lg-8">
-                  <label for="client_id">
+                  <!-- <label for="client_id">-->
+                  <label>
                     Para <span class="text-danger">*</span>
                   </label>
-                  <select
-                    class="custom-select"
-                    id="client_id"
-                    name="client_id"
-                  >
-                    <option value="">Selecione um destinatário</option>
-                    <option
-                      v-for="(client, key) in clients"
-                      :value="client.id"
-                      :key="key"
-                    >{{client.contact}}</option>
-                  </select>
+                  <!--                  <select-->
+                  <!--                    class="custom-select"-->
+                  <!--                    id="client_id"-->
+                  <!--                    name="client_id"-->
+                  <!--                  >-->
+                  <!--                    <option value="">Selecione um destinatário</option>-->
+                  <!--                    <option-->
+                  <!--                      v-for="(client, key) in clients"-->
+                  <!--                      :value="client.id"-->
+                  <!--                      :key="key"-->
+                  <!--                    >{{client.contact}}</option>-->
+                  <!--                  </select>-->
+                  <br>
+                  <div v-for="(client, key, index) in clients" :key="index">
+                    <input type="checkbox" :id="key" :name="'client_ids[]'" :value="client.id">
+                    <label :for="key">{{ client.contact }}</label>
+                  </div>
+                  <br>
                 </div>
               </div>
             </div>
@@ -101,9 +108,6 @@
                     class="modal-body"
                     style="max-width:1200px"
                   >
-
-                  {{arrayFotosSelecionadasTabs}}
-
                     <div class="row">
                       <div
                         v-if="loading"
@@ -254,15 +258,15 @@ export default {
     ...mapGetters(['new_cart','DIRECTORY_SEPARATOR']),
   },
   created() {
-    
+
   },
   methods: {
     ...mapActions(['getUserPhotos']),
     fotoParaObjetoFoto(foto){
       return {
-                id: `${foto}`,
-                src: `${foto}`,
-              }
+        id: `${foto}`,
+        src: `${foto}`,
+      }
     },
     escolherFotosContinuar () {
       this.loading = true
@@ -277,26 +281,26 @@ export default {
 
       this.arrayFotos = {}
       this.getUserPhotos(ids)
-        .then(perfis_fotos => {
-          this.arrayFotos = perfis_fotos
-          let objeto_fotos = [] 
-          for (const i in perfis_fotos) {
-            const fotos = perfis_fotos[i];
-            for (const j in fotos) {
-              const foto = fotos[j];
-              objeto_fotos.push(this.fotoParaObjetoFoto(foto))
-            } 
-          }
+          .then(perfis_fotos => {
+            this.arrayFotos = perfis_fotos
+            let objeto_fotos = []
+            for (const i in perfis_fotos) {
+              const fotos = perfis_fotos[i];
+              for (const j in fotos) {
+                const foto = fotos[j];
+                objeto_fotos.push(this.fotoParaObjetoFoto(foto))
+              }
+            }
 
-          this.selectedImages = objeto_fotos
-          this.montarArrayFotosSelecionadas(objeto_fotos)
-          this.clickTab(this.new_cart[0])
-        })
-        .finally(() => {
-          this.loading = false
-        })
+            this.selectedImages = objeto_fotos
+            this.montarArrayFotosSelecionadas(objeto_fotos)
+            this.clickTab(this.new_cart[0])
+          })
+          .finally(() => {
+            this.loading = false
+          })
     },
-    montarArrayFotosSelecionadas(fotos){    
+    montarArrayFotosSelecionadas(fotos){
       let aux = {}
       for (const i in fotos) {
         const foto = fotos[i];
@@ -332,8 +336,10 @@ export default {
       this.loading = false
     },
     pegarUserIdPelaFoto(foto){
-      let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
-      let user_id = path_partes[path_partes.length - 2]
+      // let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
+      // let user_id = path_partes[path_partes.length - 2]
+      let path_partes = foto.split("/");
+      let user_id = path_partes[3]
       return user_id
     }
   },
