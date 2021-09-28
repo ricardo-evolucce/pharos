@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Cart;
 use App\Client;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CartStoreRequest;
 use App\Mail\CartProfiles;
 use App\Profile;
 use Exception;
@@ -49,31 +50,66 @@ class CartController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+//    public function storeOld(Request $request)
+//    {
+//
+//        request()->validate([
+//            'name' => 'required',
+//            'client_id' => 'required',
+//            'profile_id' => 'required_without_all',
+//        ]);
+//
+//        // DB::beginTransaction();
+//
+//        $cart = Cart::create($request->all());
+//        $cart->profiles()->sync($request->profile_id);
+//
+//        $message = "O pedido foi salvo na lista de carrinhos!";
+//
+//        $this->savePDFPhotos($cart, $request->get('fotos'));
+//
+//        if ($request->action == 'create_send') {
+//            if (!$this->send($cart)) {
+//                return redirect()->route('carts.index')
+//                    ->with('warning', 'Ocorreu um erro ao enviar o pedido!');
+//            }
+//
+//            $message = "O pedido foi criado e enviado para produtora!";
+//        }
+//
+//        return redirect()->route('carts.index')
+//            ->with('success', $message);
+//    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(CartStoreRequest $request)
     {
-        
-        request()->validate([
-            'name' => 'required',
-            'client_id' => 'required',
-            'profile_id' => 'required_without_all',
-        ]);
+        $data = $request->all();
+        foreach ($data["client_ids"] as $client_id){
 
-        // DB::beginTransaction();
-        
-        $cart = Cart::create($request->all());
-        $cart->profiles()->sync($request->profile_id);
-        
-        $message = "O pedido foi salvo na lista de carrinhos!";
+            $dataCreate = array(
+                "client_id" => $client_id,
+                "name" => $data["name"]
+            );
 
-        $this->savePDFPhotos($cart, $request->get('fotos'));
+            $cart = Cart::create($dataCreate);
+            $cart->profiles()->sync($data["profile_id"]);
+            $this->savePDFPhotos($cart, $request->get('fotos'));
+            $message = "O pedido foi salvo na lista de carrinhos!";
 
-        if ($request->action == 'create_send') {
-            if (!$this->send($cart)) {
-                return redirect()->route('carts.index')
-                    ->with('warning', 'Ocorreu um erro ao enviar o pedido!');
+            if ($request->action == 'create_send') {
+                if (!$this->send($cart)) {
+                    return redirect()->route('carts.index')
+                        ->with('warning', 'Ocorreu um erro ao enviar o pedido!');
+                }
+
+                $message = "O pedido foi criado e enviado para produtora!";
             }
-
-            $message = "O pedido foi criado e enviado para produtora!";
         }
 
         return redirect()->route('carts.index')
@@ -143,23 +179,22 @@ class CartController extends Controller
      * @return void
      */
     private function savePDFPhotos(Cart $cart, $profiles_photos){
-        // dd($profiles_photos);
         if ($cart->profiles->count() > 0) {
+            try {
+                $path = public_path("uploads/carts/{$cart->id}");
+                File::makeDirectory($path, 0775, true);
 
-            $path = public_path("uploads/carts/{$cart->id}");
-            File::makeDirectory($path, 0775, true);
-            
-            // $path = public_path("uploads/carts/760");
+                foreach ($cart->profiles as $profile) {
+                    $name = str_slug($profile->user->name);
 
-            foreach ($cart->profiles as $profile) {
-                $name = str_slug($profile->user->name);
-                
-                $fotos = $profiles_photos[$profile->user_id];
-                $foto_principal = array_splice($fotos,0,1)[0]; //sempre a primeira do array
-                $fotos_grupos = array_chunk(array_splice($fotos,0,4), 2); //recupera apenas 4 fotos
-                
-                PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
-                // dd("{$path}/{$name}.pdf");
+                    $fotos = $profiles_photos[$profile->user_id];
+                    $foto_principal = array_splice($fotos,0,1)[0]; //sempre a primeira do array
+                    $fotos_grupos = array_chunk(array_splice($fotos,0,4), 2); //recupera apenas 4 fotos
+
+                    PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
+                }
+            }catch(Exception $e){
+                return redirect()->back()->withInput()->with('error', 'Não foi prosseguir com a solicitação ERRO. Linha: ' . $e->getLine() . ' - Mensagem: ' . $e->getMessage());
             }
         }
     }
