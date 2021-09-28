@@ -27,6 +27,7 @@ Vue.component('profile-list', require('./components/ProfileList.vue'));
 Vue.component('profile-item', require('./components/ProfileItem.vue'));
 Vue.component('profile-filter', require('./components/ProfileFilter.vue'));
 Vue.component('view-cart-create', require('./components/Views/CartCreate.vue'));
+Vue.component('view-cart-edit', require('./components/Views/CartEdit.vue'));
 
 const app = new Vue({
     el: '#app',

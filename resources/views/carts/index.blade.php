@@ -14,7 +14,7 @@
                     </ol>
                 </nav>
             </div>
-       </div>
+        </div>
     </div>
     <!-- END Hero -->
 
@@ -22,28 +22,28 @@
         <a href="{{ route('carts.create') }}" class="btn btn-primary push">Novo carrinho</a>
 
         @if ($message = Session::get('success'))
-        <div class="alert alert-success d-flex align-items-center" role="alert">
-            <div class="flex-00-auto">
-                <i class="fa fa-fw fa-check"></i>
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <div class="flex-00-auto">
+                    <i class="fa fa-fw fa-check"></i>
+                </div>
+                <div class="flex-fill ml-3">
+                    <p class="mb-0">{{$message}}</p>
+                </div>
             </div>
-            <div class="flex-fill ml-3">
-                <p class="mb-0">{{$message}}</p>
-            </div>
-        </div>
         @endif
 
         @if ($message = Session::get('warning'))
-        <div class="alert alert-warning d-flex align-items-center" role="alert">
-            <div class="flex-00-auto">
-                <i class="fa fa-fw fa-bell"></i>
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <div class="flex-00-auto">
+                    <i class="fa fa-fw fa-bell"></i>
+                </div>
+                <div class="flex-fill ml-3">
+                    <p class="mb-0">{{$message}}</p>
+                </div>
             </div>
-            <div class="flex-fill ml-3">
-                <p class="mb-0">{{$message}}</p>
-            </div>
-        </div>
         @endif
-    
-    
+
+
         <div class="block block-rounded block-bordered">
             <div class="block-header block-header-default">
                 <h3 class="block-title">Lista de pedidos</h3>
@@ -51,19 +51,19 @@
             <div class="block-content">
                 <table class="js-table-sections table table-hover table-vcenter">
                     <thead>
-                        <tr class="text-uppercase">
-                            <th style="width: 30px;"></th>
-                            <th style="width: 300px;">Para</th>
-                            <th>Nome</th>
-                            <th class="text-center" style="width: 100px;">AGENCIADOS</th>
-                            <th class="text-center" style="width: 200px;">CRIADO EM</th>
-                            <th class="text-center" style="width: 100px;">ENVIADO</th>
-                            <th class="text-center" style="width: 100px;">PDF</th>
-                            <th class="text-center" style="width: 100px;">AÇÕES</th>
-                        </tr>
+                    <tr class="text-uppercase">
+                        <th style="width: 30px;"></th>
+                        <th style="width: 300px;">Para</th>
+                        <th>Nome</th>
+                        <th class="text-center" style="width: 100px;">AGENCIADOS</th>
+                        <th class="text-center" style="width: 200px;">CRIADO EM</th>
+                        <th class="text-center" style="width: 100px;">ENVIADO</th>
+                        <th class="text-center" style="width: 100px;">PDF</th>
+                        <th class="text-center" style="width: 100px;">AÇÕES</th>
+                    </tr>
                     </thead>
                     @foreach ($carts as $cart)
-                    <tbody class="js-table-sections-header">
+                        <tbody class="js-table-sections-header">
                         <tr>
                             <td class="text-center">
                                 <i class="fa fa-angle-right text-muted"></i>
@@ -83,65 +83,82 @@
                             </td>
                             <td class="text-center">
                                 @if ($cart->sent == 1)
-                                <span class="badge badge-success">ENVIADO</span>
+                                    <span class="badge badge-success">ENVIADO</span>
                                 @else
-                                <span class="badge badge-danger">NÃO ENVIADO</span>
+                                    <span class="badge badge-danger">NÃO ENVIADO</span>
                                 @endif
                             </td>
                             <td class="text-center">
                                 {{$cart->profiles->count()}}
                             </td>
-                            <td class="text-center">
+                            <td class="text-right">
                                 <div class="btn-group">
                                     <a href="{{ route('carts.send', $cart->id) }}" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Enviar" data-placement="left">
                                         <i class="fa fa-paper-plane"></i>
                                     </a>
                                 </div>
-                                     <div class="btn-group">
-                               <form action="{{ route('carts.delete') }}" method="POST" onSubmit="return confirm('Apagar carrinho?');">
-                                    @csrf
-                                    <input type="hidden" name="id" value="{{$cart->id}}" />
-                                    <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Apagar" data-placement="left">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-
-                            </div>
+                                <div class="btn-group">
+                                    <form action="{{ route('carts.edit') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{$cart->id}}" />
+                                        <button type="submit" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Editar" data-placement="left">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="btn-group">
+                                    <form action="{{ route('carts.delete') }}" method="POST" onSubmit="return confirm('Apagar carrinho?');">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{$cart->id}}" />
+                                        <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Apagar" data-placement="left">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="btn-group">
+                                    <form action="{{ route('carts.duplicate')}}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{$cart->id}}" />
+                                        <button type="submit" class="btn btn-sm btn-success" data-toggle="tooltip" title="Duplicar" data-placement="left">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
-                    </tbody>
-                    <tbody class="font-size-sm">
+                        </tbody>
+                        <tbody class="font-size-sm">
                         @foreach ($cart->profiles as $profile)
-                        <tr>
-                            <td class="text-center">
-                                @if ($profile->medias->first())
-                                <img class="img-avatar img-avatar32" src="{{ asset('uploads/profiles/'. $profile->id . '/thumb/' . $profile->medias->first()->path) }}" alt="">
-                                @else
-                                <img class="img-avatar img-avatar32" src="https://api.adorable.io/avatars/48/{{$profile->user->email}}" alt="">
-                                @endif
-                            </td>
-                            <td class="font-w600">
-                                {{$profile->user->name}}
-                            </td>
-                            <td class="font-w600">
-                                {{$profile->user->email}}
-                            </td>
-                            <td class=""></td>
-                            <td class=""></td>
-                            <td class=""></td>
-                            <td class="text-center">
-                                <a href="{{ route('profile.preview', [$cart->id, str_slug($profile->id)]) }}" data-toggle="tooltip" title="Visualizar" data-placement="left" target="_blank">
-                                    <i class="fas fa-file-pdf fa-lg"></i>
-                                </a>
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ route('profiles.edit', $profile->id) }}" target="_blank" class="btn btn-sm btn-outline-info" data-toggle="tooltip" title="Perfil completo" data-placement="left">
-                                    <i class="fa fa-external-link-alt fa-sm"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="text-center">
+                                    @if ($profile->medias->first())
+                                        <img class="img-avatar img-avatar32" src="{{ asset('uploads/profiles/'. $profile->id . '/thumb/' . $profile->medias->first()->path) }}" alt="">
+                                    @else
+                                        <img class="img-avatar img-avatar32" src="https://api.adorable.io/avatars/48/{{$profile->user->email}}" alt="">
+                                    @endif
+                                </td>
+                                <td class="font-w600">
+                                    {{$profile->user->name}}
+                                </td>
+                                <td class="font-w600">
+                                    {{$profile->user->email}}
+                                </td>
+                                <td class=""></td>
+                                <td class=""></td>
+                                <td class=""></td>
+                                <td class="text-center">
+                                    <a href="{{ route('profile.preview', [$cart->id, str_slug($profile->id)]) }}" data-toggle="tooltip" title="Visualizar" data-placement="left" target="_blank">
+                                        <i class="fas fa-file-pdf fa-lg"></i>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ route('profiles.edit', $profile->id) }}" target="_blank" class="btn btn-sm btn-outline-info" data-toggle="tooltip" title="Perfil completo" data-placement="left">
+                                        <i class="fa fa-external-link-alt fa-sm"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         @endforeach
-                    </tbody>
+                        </tbody>
                     @endforeach
                 </table>
 
@@ -154,4 +171,3 @@
 @section('js_after')
     <script>jQuery(function(){ Dashmix.helpers(['table-tools-checkable', 'table-tools-sections']); });</script>
 @stop
-        
