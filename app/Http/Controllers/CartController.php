@@ -135,7 +135,16 @@ class CartController extends Controller
      */
     public function edit(Cart $cart)
     {
-        return view('admin.carts.edit');
+        $cart = Cart::find($cart->id);
+        $clients = Client::all();
+        $profiles = Profile::all();
+        $selectedProfiles = [];
+
+        foreach($cart->profiles as $profile) {
+            $selectedProfiles[] = $profile->id;
+        }
+        $profilesSelects = collect($selectedProfiles);
+        return view('carts.edit', compact("cart","clients", "profiles", "profilesSelects"));
     }
 
     /**
@@ -242,10 +251,8 @@ class CartController extends Controller
         return true;
     }
 
-      public function delete(Request $cart)
+    public function delete(Request $cart)
     {
-
-
         //obtem dados do carrinho
         $carrinho = Cart::find($cart->id);  
         $carrinho->delete();
@@ -255,10 +262,21 @@ class CartController extends Controller
 
         return redirect()->route('carts.index')
             ->with('success', 'Carrinho excluido com sucesso!'); 
-        
 
+    }
+    public function duplicate(Request $cart){
 
+        $carrinho = Cart::find($cart->id);
 
+        $novoCarrinho = array(
+            "name" => $carrinho->name,
+            "client_id" => $carrinho->client_id,
+            "sent" => 0
+        );
+        $cart = Cart::create($novoCarrinho);
+        $cart->profiles()->sync($cart->profile_id);
 
+        return redirect()->route('carts.index')
+            ->with('success', 'Carrinho duplicado com sucesso!');
     }
 }
