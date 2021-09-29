@@ -223,7 +223,7 @@
             </div>
           </div>
           <!-- END Submit -->
-          {{arrayFotosSelecionadasTabs}}
+          <!-- {{ arrayFotosSelecionadasTabs}} -->
           <template v-for="(fotos, profile_id) in arrayFotosSelecionadasTabs">
             <input
               v-for="foto in fotos"
