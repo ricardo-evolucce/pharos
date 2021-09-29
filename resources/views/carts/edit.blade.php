@@ -33,7 +33,7 @@
                 </div>
             @endif
 {{--            {{dump($clients)}}--}}
-            <view-cart-edit :cart="{{$cart}}" :clients="{{$clients}}" :profiles="{{$profiles}}" :profiles_select="{{$profilesSelects}}" csrf_token="{{csrf_token()}}" action="{{route('carts.update')}}" />
+            <view-cart-edit :cart="{{$cart}}" :clients="{{$clients}}" :profiles="{{$profiles}}" :profiles_select="{{$profilesSelects}}" csrf_token="{{csrf_token()}}" action="{{route('carts.update', $cart->id)}}" />
             <!-- END Main Content -->
         </div>
     </div>

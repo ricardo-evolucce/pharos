@@ -98,13 +98,9 @@
                                     </a>
                                 </div>
                                 <div class="btn-group">
-                                    <form action="{{ route('carts.edit') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{$cart->id}}" />
-                                        <button type="submit" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Editar" data-placement="left">
-                                            <i class="fa fa-edit"></i>
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('carts.edit', $cart->id) }}" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Editar" data-placement="left">
+                                        <i class="fa fa-pencil-alt"></i>
+                                    </a>
                                 </div>
                                 <div class="btn-group">
                                     <form action="{{ route('carts.delete') }}" method="POST" onSubmit="return confirm('Apagar carrinho?');">

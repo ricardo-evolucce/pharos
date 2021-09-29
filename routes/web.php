@@ -83,8 +83,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carts/{cart}/preview/{profile}', 'CartController@previewPDF')->name('profile.preview');
     Route::get('/carts/{cart}/send', 'CartController@sendCart')->name('carts.send');
     Route::post('/carts/delete', 'CartController@delete')->name('carts.delete');
-    Route::post('/carts/edit', 'CartController@edit')->name('carts.edit');
-    Route::post('/carts/update', 'CartController@update')->name('carts.update');
+    Route::post('/carts/{cart}/edit', 'CartController@edit')->name('carts.edit');
+    Route::post('/carts/update/{cart}', 'CartController@update')->name('carts.update');
     Route::post('/carts/duplicate', 'CartController@duplicate')->name('carts.duplicate');
 
     // Profile
