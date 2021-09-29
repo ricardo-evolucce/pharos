@@ -11,6 +11,16 @@
             name="_token"
             :value="csrf_token"
           >
+
+          <!-- Validações do request -->
+
+          <div v-if="validate_errors.length > 0" class="alert alert-danger">
+            <ul>
+              <span v-for="(error) in validate_errors">
+                  <li>{{error}}</li>
+              </span>
+            </ul>
+          </div>
           <!-- {{clients}} -->
           <!-- @csrf -->
           <!-- Vital Info -->
@@ -21,7 +31,7 @@
                 Algumas informações importantes sobre seu novo carrinho.
               </p>
             </div>
-            <div class="col-lg-8 col-xl-5">
+            <div class="col-lg-12 col-xl-12">
               <div class="form-group">
                 <label for="name">
                   Nome <span class="text-danger">*</span>
@@ -35,23 +45,23 @@
                 >
               </div>
               <div class="form-group row">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                   <!-- <label for="client_id">-->
                   <label>
                     Para <span class="text-danger">*</span>
                   </label>
-                  <!--                  <select-->
-                  <!--                    class="custom-select"-->
-                  <!--                    id="client_id"-->
-                  <!--                    name="client_id"-->
-                  <!--                  >-->
-                  <!--                    <option value="">Selecione um destinatário</option>-->
-                  <!--                    <option-->
-                  <!--                      v-for="(client, key) in clients"-->
-                  <!--                      :value="client.id"-->
-                  <!--                      :key="key"-->
-                  <!--                    >{{client.contact}}</option>-->
-                  <!--                  </select>-->
+<!--                  <select-->
+<!--                    class="custom-select"-->
+<!--                    id="client_id"-->
+<!--                    name="client_id"-->
+<!--                  >-->
+<!--                    <option value="">Selecione um destinatário</option>-->
+<!--                    <option-->
+<!--                      v-for="(client, key) in clients"-->
+<!--                      :value="client.id"-->
+<!--                      :key="key"-->
+<!--                    >{{client.contact}}</option>-->
+<!--                  </select>-->
                   <br>
                   <div v-for="(client, key, index) in clients" :key="index">
                     <input type="checkbox" :id="key" :name="'client_ids[]'" :value="client.id">
@@ -233,14 +243,14 @@
 </template>
 
 <script>
-
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
   props: {
     csrf_token: String,
     action: String,
-    clients: Array
+    clients: Array,
+    validate_errors: Array
   },
   data () {
     return {
