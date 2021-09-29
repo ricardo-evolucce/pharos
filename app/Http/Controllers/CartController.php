@@ -140,7 +140,6 @@ class CartController extends Controller
         $clients = Client::all();
         $profiles = Profile::all();
         $selectedProfiles = [];
-
         foreach($cart->profiles as $profile) {
             $selectedProfiles[] = $profile->id;
         }
@@ -157,7 +156,15 @@ class CartController extends Controller
      */
     public function update(Request $request, Cart $cart)
     {
-        //
+        $data = $request->all();
+//        dd($cart);
+        $cart->update($data);
+//        foreach ($data["profile_ids"] as $profile_id){
+//           $cart->profiles()->sync($profile_id);
+//        }
+
+        return redirect()->route('carts.index')
+            ->with('success', 'Carrinho atualizado com sucesso!');
     }
 
     /**
@@ -203,15 +210,17 @@ class CartController extends Controller
                     $fotos_grupos = [];
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
-                            $foto = $this->createThumbnail(public_path($fotos[$i]), $pathImgCompress."/img-".$i."-compress.jpg", 200,200);  //sempre a primeira do array
+                            $foto = $this->createThumbnail(public_path($fotos[$i]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);  //sempre a primeira do array
                             array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal
                         unset($fotos_grupos[0]); // remove a primeira foto do array
-
                         PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
+
                     }
+//                   Storage::disk('public')->deleteDirectory("/carts/{$cart->id}/min");
                 }
+
             }catch(Exception $e){
                 return redirect()->back()->withInput()->with('error', 'Não foi prosseguir com a solicitação ERRO. Linha: ' . $e->getLine() . ' - Mensagem: ' . $e->getMessage());
             }
