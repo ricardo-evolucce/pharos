@@ -97,7 +97,6 @@ class CartController extends Controller
                 "client_id" => $client_id,
                 "name" => $data["name"]
             );
-
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($data["profile_id"]);
             $this->savePDFPhotos($cart, $request->get('fotos'));
@@ -218,7 +217,6 @@ class CartController extends Controller
                         PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
 
                     }
-//                   Storage::disk('public')->deleteDirectory("/carts/{$cart->id}/min");
                 }
 
             }catch(Exception $e){
@@ -287,19 +285,54 @@ class CartController extends Controller
             ->with('success', 'Carrinho excluido com sucesso!'); 
 
     }
+    /**
+     *  1 - Find no carrinho anterior
+     *  2 - Adiciona ao array $profiles_id os id's para utilização do sync
+     *  3 - Salva novo carrinho com status de não enviado
+     *  4 - Copia o diretório anterior para o armazenamento dos pdf's e fotos
+     **/
     public function duplicate(Request $cart){
 
         $carrinho = Cart::find($cart->id);
+        $profiles_id = [];
+        foreach ($carrinho->profiles as $profile){
+            array_push($profiles_id, $profile->id);
+        }
 
         $novoCarrinho = array(
             "name" => $carrinho->name,
             "client_id" => $carrinho->client_id,
             "sent" => 0
         );
-        $cart = Cart::create($novoCarrinho);
-        $cart->profiles()->sync($cart->profile_id);
+        $cartNew = Cart::create($novoCarrinho);
+        $cartNew->profiles()->sync($profiles_id);
+
+        // copia o diretório do pdf e imagens comprimidas
+        $path = public_path("uploads/carts/{$cart->id}");
+        $pathNew = public_path("uploads/carts/{$cartNew->id}");
+        if (!is_dir($pathNew)) {
+            File::makeDirectory($pathNew, 0775, true);
+        }
+
+        $this->recurse_copy($path, $pathNew);
 
         return redirect()->route('carts.index')
             ->with('success', 'Carrinho duplicado com sucesso!');
+    }
+    function recurse_copy($src,$dst) {
+//        dd($src);
+        $dir = opendir($src);
+        @mkdir($dst);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($src . '/' . $file) ) {
+                    recurse_copy($src . '/' . $file,$dst . '/' . $file);
+                }
+                else {
+                    copy($src . '/' . $file,$dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
     }
 }
