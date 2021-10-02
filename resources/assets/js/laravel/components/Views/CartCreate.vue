@@ -5,21 +5,19 @@
         <form
           :action="action"
           method="POST"
+          @submit="checkForm"
         >
           <input
             type="hidden"
             name="_token"
             :value="csrf_token"
           >
-
-          <!-- Validações do request -->
-
-          <div v-if="validate_errors.length > 0" class="alert alert-danger">
-            <ul>
-              <span v-for="(error) in validate_errors">
-                  <li>{{error}}</li>
-              </span>
-            </ul>
+          <!-- erros do request -->
+          <div v-if="errors.name || errors.client_ids" class="alert alert-danger">
+              <ul>
+                  <li v-if="errors.name">{{errors.name[0]}}</li>
+                  <li v-if="errors.client_ids">{{errors.client_ids[0]}}</li>
+              </ul>
           </div>
           <!-- {{clients}} -->
           <!-- @csrf -->
@@ -41,6 +39,7 @@
                   class="form-control"
                   id="name"
                   name="name"
+                  v-model="name"
                   placeholder="ex.: Meu carrinho"
                 >
               </div>
@@ -64,8 +63,15 @@
 <!--                  </select>-->
                   <br>
                   <div v-for="(client, key, index) in clients" :key="index">
-                    <input type="checkbox" :id="key" :name="'client_ids[]'" :value="client.id">
-                    <label :for="key">{{ client.contact }}</label>
+                    <input type="checkbox"
+                           :id="key"
+                           :name="'client_ids[]'"
+                           :value="client.id"
+                           v-model="client_ids">
+                           <label
+                               :for="key">
+                               {{ client.contact }}
+                           </label>
                   </div>
                   <br>
                 </div>
@@ -250,7 +256,6 @@ export default {
     csrf_token: String,
     action: String,
     clients: Array,
-    validate_errors: Array
   },
   data () {
     return {
@@ -259,6 +264,10 @@ export default {
       arrayFotosTab: [],
       arrayFotosSelecionadasTabs: {},
       selectedImages: [],
+      errors: [],
+      name: '',
+      client_ids: [],
+      profile_id: [],
       tab: {
         profile: null
       }
@@ -284,9 +293,11 @@ export default {
       this.selectedImages = []
 
       let ids = []
+      this.profile_id = []
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
+        this.profile_id.push(profile.user_id)
       }
 
       this.arrayFotos = {}
@@ -348,10 +359,42 @@ export default {
     pegarUserIdPelaFoto(foto){
       // let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
       // let user_id = path_partes[path_partes.length - 2]
-
       let path_partes = foto.split("/");
       let user_id = path_partes[3]
       return user_id
+    },
+    checkForm: function (e) {
+      let dataform;
+      dataform = new FormData();
+      dataform.append('name', this.name);
+
+      if(this.client_ids.length > 0){
+        for (var a = 0; a < this.client_ids.length; a++) {
+          dataform.append('client_ids[]', this.client_ids[a]);
+        }
+      }else{
+          dataform.append('client_ids', this.client_ids);
+      }
+
+      if(this.profile_id.length > 0){
+        for (var y = 0; y < this.profile_id.length; y++) {
+          dataform.append('profile_id[]', this.profile_id[y]);
+        }
+      }else{
+        dataform.append('profile_id', this.profile_id);
+      }
+      axios.post('/carts', dataform).then( response => {
+          console.log("resposta", response);
+          this.name = '';
+          this.client_ids = [];
+          this.success = true;
+        }).catch((error) => {
+          if(error.response.status === 422){
+            this.errors = error.response.data.errors;
+          }
+        this.success = false;
+      });
+      e.preventDefault();
     }
   },
 }
