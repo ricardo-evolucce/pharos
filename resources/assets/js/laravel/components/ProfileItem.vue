@@ -1,7 +1,7 @@
 <template>
     <div class="col-md-4 col-xl-4">
       <div class="custom-control custom-block custom-control-primary">
-            <input type="checkbox" class="custom-control-input" :id="'profile_' + profile.id" name="profile_id[]" :value="profile.id" :checked="profiles_select.includes(profile.id)">
+            <input type="checkbox" class="custom-control-input" :id="'profile_' + profile.id" name="profile_id[]" :value="profile.id">
             <label class="custom-control-label" v-bind:for="'profile_' + profile.id " @click="toggleItemNewCart(profile)">
                 <span class="d-flex align-items-center">
                     <img class="img-avatar img-avatar48" :src="getAvatarSrc(profile.avatar)" alt="">
@@ -18,7 +18,7 @@
 import { mapActions } from 'vuex'
 export default {
     name: 'ProfileItem',
-    props: ['index', 'profile','profiles_select'],
+    props: ['index', 'profile'],
     methods: {
         ...mapActions(['toggleItemNewCart']),
         getAvatarSrc(src){
@@ -31,9 +31,8 @@ export default {
                 aux = src
             }
             return aux
-            
+
         }
     },
-
 }
 </script>
