@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-8 col-lg-7 col-xl-9 order-md-0 bg-body-dark">
             <!-- Main Content -->
-            <view-cart-create :clients="{{$clients}}" :validate_errors="{{collect($errors->all())}}" csrf_token="{{csrf_token()}}" action="{{route('carts.store')}}" />
+            <view-cart-create :clients="{{$clients}}" csrf_token="{{csrf_token()}}" action="{{route('carts.store')}}" />
             <!-- END Main Content -->
         </div>
     </div>
