@@ -139,11 +139,16 @@ class CartController extends Controller
         $clients = Client::all();
         $profiles = Profile::all();
         $selectedProfiles = [];
+        $selectedProfilesIds = [];
+//        dd($cart->profiles);
         foreach($cart->profiles as $profile) {
-            $selectedProfiles[] = $profile->id;
+            $selectedProfiles[] = $profile;
+            $selectedProfilesIds[] = $profile->id;
         }
         $profilesSelects = collect($selectedProfiles);
-        return view('carts.edit', compact("cart","clients", "profiles", "profilesSelects"));
+        $profilesSelectsIds = collect($selectedProfilesIds);
+//        dd($profilesSelects);
+        return view('carts.edit', compact("cart","clients", "profiles", "profilesSelects","profilesSelectsIds"));
     }
 
     /**
@@ -196,6 +201,7 @@ class CartController extends Controller
      */
     private function savePDFPhotos(Cart $cart, $profiles_photos){
         if ($cart->profiles->count() > 0) {
+
             try {
                 $path = public_path("uploads/carts/{$cart->id}");
                 File::makeDirectory($path, 0775, true);
@@ -215,7 +221,6 @@ class CartController extends Controller
                         $foto_principal =  $fotos_grupos[0]; // foto principal
                         unset($fotos_grupos[0]); // remove a primeira foto do array
                         PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
-
                     }
                 }
 
