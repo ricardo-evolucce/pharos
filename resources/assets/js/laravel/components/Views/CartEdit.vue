@@ -39,7 +39,7 @@
                 <h2 class="content-heading pt-0">Agenciados</h2>
                 <div class="row push">
                   <div class="col-lg-12">
-                    <profile-list ref="profile-list" :profiles_select = "profiles_select"></profile-list>
+                    <profile-list-edit ref="profile-list-edit" :profiles_select = "profiles_select" :profiles_ids = "profiles_ids"></profile-list-edit>
                   </div>
                 </div>
                 <!-- END People -->
@@ -93,7 +93,7 @@
                                 class="col-12"
                             >
                              <!-- {{arrayFotos}} -->
-                             <!-- {{arrayFotosSelecionadasTabs}} -->
+                             <!--{{arrayFotosSelecionadasTabs}}-->
                              <!-- {{selectedImages}} -->
                              <!-- TABS -->
                               <nav>
@@ -125,7 +125,6 @@
                                     :id="`nav-${profile.id}`"
                                     role="tabpanel"
                                 >
-
                                   <div class="row">
                                     <div class="col col-12">
                                       <vue-select-image
@@ -166,7 +165,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-lg-8 col-xl-5 offset-lg-4">
                     <div class="form-group">
                       <button
@@ -184,7 +182,7 @@
                   </div>
                 </div>
                 <!-- END Submit -->
-                 {{ arrayFotosSelecionadasTabs}}
+                <!--{{ arrayFotosSelecionadasTabs}}-->
                 <template v-for="(fotos, profile_id) in arrayFotosSelecionadasTabs">
                   <input
                       v-for="foto in fotos"
@@ -206,8 +204,10 @@
 <script>
 
 import {mapActions, mapGetters} from "vuex";
+import ProfileListEdit from "../ProfileListEdit";
 
 export default {
+  components: {ProfileListEdit},
   props: {
     csrf_token: String,
     action: String,
@@ -215,12 +215,14 @@ export default {
     clients: Array,
     profiles: Array,
     profiles_select: Array,
+    profiles_ids: Array,
   },
   data () {
     return {
       loading: false,
       arrayFotos: {},
       arrayFotosTab: [],
+      ids: [],
       arrayFotosSelecionadasTabs: {},
       selectedImages: [],
       tab: {
@@ -232,10 +234,10 @@ export default {
     ...mapGetters(['new_cart','DIRECTORY_SEPARATOR']),
   },
   created() {
-
+    this.fotosEscolhidas();
   },
   methods: {
-    ...mapActions(['getUserPhotos']),
+    ...mapActions(['getUserPhotos','toggleItemNewCart']),
     fotoParaObjetoFoto(foto){
       return {
         id: `${foto}`,
@@ -246,14 +248,14 @@ export default {
       this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
+      this.arrayFotos = {}
 
-      let ids = []
+       let ids = []
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
       }
 
-      this.arrayFotos = {}
       this.getUserPhotos(ids)
           .then(perfis_fotos => {
             this.arrayFotos = perfis_fotos
@@ -267,7 +269,6 @@ export default {
             }
 
             this.selectedImages = objeto_fotos
-            console.log("imagens 1", this.selectedImages);
             this.montarArrayFotosSelecionadas(objeto_fotos)
             this.clickTab(this.new_cart[0])
           })
@@ -275,6 +276,41 @@ export default {
             this.loading = false
           })
     },
+    fotosEscolhidas () {
+       this.arrayFotosTab = []
+       this.selectedImages = []
+       this.arrayFotos = {}
+
+       for(const pro in this.profiles_select){
+          this.toggleItemNewCart(this.profiles_select[pro])
+
+          for (const key in this.new_cart) {
+            const profile = this.new_cart[key];
+            this.ids.push(profile.user_id)
+            this.getUserPhotos(this.ids).then(perfis_fotos => {
+                  this.arrayFotos = perfis_fotos
+                  let objeto_fotos = []
+                  for (const i in perfis_fotos) {
+                    const fotos = perfis_fotos[i];
+                    for (const j in fotos) {
+                      const foto = fotos[j];
+                      objeto_fotos.push(this.fotoParaObjetoFoto(foto))
+                    }
+                  }
+
+                  this.selectedImages = objeto_fotos
+                  console.log("imagens 3 objeto", this.selectedImages);
+                  this.montarArrayFotosSelecionadas(objeto_fotos)
+
+                  this.clickTab(this.new_cart[0])
+                })
+              .finally(() => {
+               this.loading = false
+            })
+          }
+       }
+    },
+
     montarArrayFotosSelecionadas(fotos){
       let aux = {}
       for (const i in fotos) {
@@ -286,8 +322,6 @@ export default {
 
         aux[user_id].push(foto)
       }
-      console.log("imagens 2", aux);
-
       this.arrayFotosSelecionadasTabs = aux
     },
     onselectmultipleimage (fotos) {
