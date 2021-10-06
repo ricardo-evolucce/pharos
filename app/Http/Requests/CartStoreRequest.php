@@ -25,9 +25,18 @@ class CartStoreRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'fotos' => 'required',
-            'profile_id' => 'required_without_all',
-//            'client_ids.required' => 'required_without_all',
+            "fotos" => [
+                'required',
+                'array'
+            ],
+            "profile_id" => [
+                'required',
+                'array'
+            ],
+            "client_ids" => [
+                'required',
+                'array'
+            ],
         ];
     }
     //Mensagem personalizada
@@ -36,8 +45,8 @@ class CartStoreRequest extends FormRequest
         return [
             'name.required' => 'Campo nome é obrigatório',
             'fotos.required' => 'Selecione pelo menos uma foto',
-            'profile_id.required' => 'Campo obrigatório',
-//            'client_ids.required' => 'Selecione pelo menos uma produtora',
+            'profile_id.required' => 'Selecione pelo menos uma perfil',
+            'client_ids.required' => 'Selecione pelo menos uma produtora',
         ];
     }
 }
