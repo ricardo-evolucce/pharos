@@ -23,17 +23,7 @@
         </div>
         <div class="col-md-8 col-lg-7 col-xl-9 order-md-0 bg-body-dark">
             <!-- Main Content -->
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-{{--            {{dump($clients)}}--}}
-            <view-cart-edit :cart="{{$cart}}" :clients="{{$clients}}" :profiles="{{$profiles}}" :profiles_select="{{$profilesSelects}}" csrf_token="{{csrf_token()}}" action="{{route('carts.update', $cart->id)}}" />
+            <view-cart-edit :cart="{{$cart}}" :clients="{{$clients}}" :profiles="{{$profiles}}" :profiles_select="{{$profilesSelects}}" :profiles_ids="{{$profilesSelectsIds}}" csrf_token="{{csrf_token()}}" action="{{route('carts.update', $cart->id)}}" />
             <!-- END Main Content -->
         </div>
     </div>
