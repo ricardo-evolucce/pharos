@@ -88,6 +88,7 @@
             </div>
           </div>
           <!-- END People -->
+
           <!-- Submit -->
           <div class="row push">
             <!-- Modal escolher fotos -->
@@ -210,6 +211,7 @@
                 </div>
               </div>
             </div>
+
             <div class="col-lg-8 col-xl-5 offset-lg-4">
               <div class="form-group">
                 <button
@@ -292,11 +294,10 @@ export default {
 
       let ids = []
       this.profile_id = []
-
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
-        this.profile_id.push(profile.id)
+        this.profile_id.push(profile.user_id)
       }
 
       this.arrayFotos = {}
@@ -311,6 +312,7 @@ export default {
                 objeto_fotos.push(this.fotoParaObjetoFoto(foto))
               }
             }
+
             this.selectedImages = objeto_fotos
             this.montarArrayFotosSelecionadas(objeto_fotos)
             this.clickTab(this.new_cart[0])
@@ -361,17 +363,33 @@ export default {
       let user_id = path_partes[3]
       return user_id
     },
-
     checkForm: function (e) {
-      axios.post('/carts', {
-        data: {
-          profile_id: this.profile_id,
-          client_ids: this.client_ids,
-          fotos: this.arrayFotos
+      let dataform;
+      dataform = new FormData();
+      dataform.append('name', this.name);
+
+      if(this.client_ids.length > 0){
+        for (var a = 0; a < this.client_ids.length; a++) {
+          dataform.append('client_ids[]', this.client_ids[a]);
         }
-      }).catch((error) => {
+      }else{
+          dataform.append('client_ids', this.client_ids);
+      }
+
+      if(this.profile_id.length > 0){
+        for (var y = 0; y < this.profile_id.length; y++) {
+          dataform.append('profile_id[]', this.profile_id[y]);
+        }
+      }else{
+        dataform.append('profile_id', this.profile_id);
+      }
+      axios.post('/carts', dataform).then( response => {
+          console.log("resposta", response);
+          this.name = '';
+          this.client_ids = [];
+          this.success = true;
+        }).catch((error) => {
           if(error.response.status === 422){
-            $('#modal').modal('hide');
             this.errors = error.response.data.errors;
           }
         this.success = false;
