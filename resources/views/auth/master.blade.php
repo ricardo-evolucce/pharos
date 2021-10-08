@@ -23,7 +23,7 @@
         <!-- Stylesheets -->
         <!-- Fonts and Dashmix framework -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700">
-        <link rel="stylesheet" id="css-main" href="{{ mix('css/dashmix.css') }}">
+        <link rel="stylesheet" id="css-main" href="{{ asset('css/dashmix.css') }}">
     </head>
     <body>
         <div id="app">
