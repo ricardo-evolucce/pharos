@@ -21,7 +21,7 @@
         <!-- Fonts and Styles -->
         @yield('css_before')
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700">
-        <link rel="stylesheet" href="{{ mix('/css/dashmix.css') }}">
+        <link rel="stylesheet" href="{{ asset('/css/dashmix.css') }}">
 
         <!-- You can include a specific file from public/css/themes/ folder to alter the default color theme of the template. eg: -->
         <!-- <link rel="stylesheet" href="{{ mix('/css/themes/xwork.css') }}"> -->
