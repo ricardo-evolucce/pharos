@@ -64,14 +64,14 @@
                   <br>
                   <div v-for="(client, key, index) in clients" :key="index">
                     <input type="checkbox"
-                           :id="key"
-                           :name="'client_ids[]'"
-                           :value="client.id"
-                           v-model="client_ids">
-                           <label
-                               :for="key">
-                               {{ client.contact }}
-                           </label>
+                       :id="key"
+                       :name="'client_ids[]'"
+                       :value="client.id"
+                       v-model="client_ids">
+                       <label
+                           :for="key">
+                           {{ client.contact }}
+                       </label>
                   </div>
                   <br>
                 </div>
@@ -196,6 +196,7 @@
                       name="action"
                       class="btn btn-success"
                       value="create_send"
+                      v-on:click="btnOnClickSelect('create_send')"
                     >
                       <i class="fa fa-check-circle mr-1"></i> Salvar e enviar
                     </button>
@@ -204,6 +205,7 @@
                       name="action"
                       class="btn btn-success"
                       value="save"
+                      v-on:click="btnOnClickSelect('save')"
                     >
                       <i class="fa fa-check-circle mr-1"></i> Salvar
                     </button>
@@ -265,6 +267,7 @@ export default {
       arrayFotosSelecionadasTabs: {},
       selectedImages: [],
       errors: [],
+      action: '',
       name: '',
       client_ids: [],
       profile_id: [],
@@ -363,19 +366,27 @@ export default {
       let user_id = path_partes[3]
       return user_id
     },
+    btnOnClickSelect(selectAction){
+      this.action = selectAction;
+    },
     checkForm: function (e) {
       axios.post('/carts', {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
-          fotos: this.arrayFotos
-      }).then(response => window.location.href = "/carts")
-       .catch((error) => {
+          fotos: this.arrayFotos,
+          action: this.action
+      }).then(response =>
+          // window.location.href = "/carts"
+          // window.location.href = "/carts"
+          alert(JSON.stringify(response.data.message))
+      ).catch((error) => {
         if(error.response.status === 422){
           $('#modal').modal('hide');
           this.errors = error.response.data.errors;
+        }else if(error.status == "error"){
+
         }
-        this.success = false;
       });
       e.preventDefault();
     }
