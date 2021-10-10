@@ -12,13 +12,6 @@
             name="_token"
             :value="csrf_token"
           >
-          <!-- erros do request -->
-          <div v-if="errors.name || errors.client_ids" class="alert alert-danger">
-              <ul>
-                  <li v-if="errors.name">{{errors.name[0]}}</li>
-                  <li v-if="errors.client_ids">{{errors.client_ids[0]}}</li>
-              </ul>
-          </div>
           <!-- {{clients}} -->
           <!-- @csrf -->
           <!-- Vital Info -->
@@ -138,8 +131,8 @@
                         class="col-12"
                       >
                         <!-- {{arrayFotos}} -->
-                        <!-- {{arrayFotosSelecionadasTabs}} -->
-                        <!-- {{selectedImages}} -->
+                        <!--{{arrayFotosSelecionadasTabs}}-->
+                         <!--{{selectedImages}}-->
                         <!-- TABS -->
                         <nav>
                           <div
@@ -232,6 +225,7 @@
           </div>
           <!-- END Submit -->
           <!-- {{ arrayFotosSelecionadasTabs}} -->
+
           <template v-for="(fotos, profile_id) in arrayFotosSelecionadasTabs">
             <input
               v-for="foto in fotos"
@@ -242,9 +236,116 @@
               :value="foto.src"
               checked
             >
+
           </template>
 
         </form>
+      </div>
+    </div>
+
+    <!-- messages error request-->
+    <div class="row">
+      <div
+          class="modal"
+          id="modal-messages-error"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="modalLabel"
+          aria-hidden="true"
+      >
+        <div
+            class="modal-dialog modal-dialog-centered"
+            style="max-width: max-content;min-width: 500px;"
+            role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>Atenção!!!</p>
+              <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div
+                class="modal-body alert alert-danger"
+                style="max-width:1200px"
+                >
+                <!-- erros do request -->
+                 <p v-if="errors.name">
+                   {{errors.name[0]}}
+                 </p>
+                <p v-if="errors.client_ids">
+                   {{errors.client_ids[0]}}
+                </p>
+                <p v-if="errors.fotos">
+                   {{errors.fotos[0]}}
+                </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- messages succes-->
+    <div class="row">
+      <div
+          class="modal"
+          id="modal-messages-sucess"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="modalLabel"
+          aria-hidden="true"
+      >
+        <div
+            class="modal-dialog modal-dialog-centered"
+            style="max-width: max-content;min-width: 500px;"
+            role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>Sucesso</p>
+              <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div
+                class="modal-body alert alert-success"
+                style="max-width:1200px"
+            >
+              <p v-if="messages">
+                {{messages}}
+              </p>
+            </div>
+            <div v-if="status == 2" class="modal-footer">
+              <button
+                  type="submit"
+                  name="action"
+                  class="btn btn-success"
+                  value="create_new"
+                  v-on:click="btnOnClickSelect('create_new')"
+              >
+                <i class="fa fa-check-circle mr-1"></i> Novo carrinho
+              </button>
+              <button
+                  type="submit"
+                  name="action"
+                  class="btn btn-success"
+                  value="back_lists"
+                  v-on:click="btnOnClickSelect('back_lists')"
+              >
+                <i class="fa fa-check-circle mr-1"></i> Ver todos
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -267,7 +368,9 @@ export default {
       arrayFotosSelecionadasTabs: {},
       selectedImages: [],
       errors: [],
-      action: '',
+      messages: '',
+      status: 0,
+      actionSelect: '',
       name: '',
       client_ids: [],
       profile_id: [],
@@ -367,25 +470,37 @@ export default {
       return user_id
     },
     btnOnClickSelect(selectAction){
-      this.action = selectAction;
+      this.actionSelect = selectAction;
+      if(this.actionSelect == "create_new"){
+        window.location.href = "/carts/create";
+      }else if(this.actionSelect == "back_lists"){
+        window.location.href = "/carts";
+      }
     },
     checkForm: function (e) {
+      this.loading = true
       axios.post('/carts', {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
           fotos: this.arrayFotos,
-          action: this.action
-      }).then(response =>
-          // window.location.href = "/carts"
-          // window.location.href = "/carts"
-          alert(JSON.stringify(response.data.message))
-      ).catch((error) => {
+          action: this.actionSelect
+      }).then(response =>{
+        this.loading = false
+        this.actionSelect = "";
+        this.messages = "";
+        this.messages = JSON.stringify(response.data.message)
+        this.status = JSON.stringify(response.data.status)
+        $('#modal').modal('hide');
+        $('#modal-messages-sucess').modal('show');
+      }).catch((error) => {
+        this.loading = false
         if(error.response.status === 422){
+          this.actionSelect = "";
+          this.errors = [];
           $('#modal').modal('hide');
+          $('#modal-messages-error').modal('show');
           this.errors = error.response.data.errors;
-        }else if(error.status == "error"){
-
         }
       });
       e.preventDefault();
