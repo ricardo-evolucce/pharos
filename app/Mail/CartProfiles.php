@@ -36,13 +36,13 @@ class CartProfiles extends Mailable
     public function build()
     {
         $email = $this->view('emails.carts.profiles')->subject($this->cart->name);
-        $path = public_path("uploads/carts/{$this->cart->id}/");
 
         foreach ($this->cart->profiles as $profile) {
-//            $filename = str_slug($profile->user->name);
-//            $email->attach("/{$path}{$filename}.pdf", [
-//                'as' => $profile->fancy_name . '.pdf',
-//            ]);
+            $filename = str_slug($profile->user->name);
+
+            $email->attach(public_path('/uploads/carts/' . $this->cart->id . '/' . $filename.".pdf"), [
+                'as' => $profile->fancy_name . '.pdf',
+            ]);
 
             if ($firstMedia = $profile->medias->first()) {
                 $email->attach(public_path('/uploads/profiles/' . $profile->user_id . '/' . $firstMedia->path), [
