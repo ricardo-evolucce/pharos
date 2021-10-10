@@ -2,14 +2,28 @@
   <div class="content content-full">
     <div class="block block-fx-pop">
       <div class="block-content">
-          <form :action="action" method="POST">
-            <input type="hidden" name="_token" :value="csrf_token">
+          <form
+            :action="action"
+            method="POST"
+            @submit="updateForm"
+          >
+            <input
+                type="hidden"
+                name="_token"
+                :value="csrf_token"
+            >
               <div class="col-lg-12 col-xl-12">
                   <div class="form-group">
                     <label for="name">
                       Nome <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control" id="name" name="name" :value="cart.name">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="name"
+                      name="name"
+                      v-model="cart.name"
+                    >
                   </div>
                   <select class="custom-select" id="client_id" name="client_id">
                     <option
@@ -149,7 +163,8 @@
                               type="submit"
                               name="action"
                               class="btn btn-success"
-                              value="create_send"
+                              value="edit_send"
+                              v-on:click="btnOnClickSelect('edit_send')"
                           >
                             <i class="fa fa-check-circle mr-1"></i> Salvar e enviar
                           </button>
@@ -158,6 +173,7 @@
                               name="action"
                               class="btn btn-success"
                               value="save"
+                              v-on:click="btnOnClickSelect('save')"
                           >
                             <i class="fa fa-check-circle mr-1"></i> Salvar
                           </button>
@@ -198,6 +214,111 @@
           </form>
       </div>
     </div>
+    <!-- messages error request-->
+    <div class="row">
+      <div
+          class="modal"
+          id="modal-messages-error"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="modalLabel"
+          aria-hidden="true"
+      >
+        <div
+            class="modal-dialog modal-dialog-centered"
+            style="max-width: max-content;min-width: 500px;"
+            role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>Atenção!!!</p>
+              <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div
+                class="modal-body alert alert-danger"
+                style="max-width:1200px"
+            >
+              <!-- erros do request -->
+              <p v-if="errors.name">
+                {{errors.name[0]}}
+              </p>
+              <p v-if="errors.client_ids">
+                {{errors.client_ids[0]}}
+              </p>
+              <p v-if="errors.fotos">
+                {{errors.fotos[0]}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- messages succes-->
+    <div class="row">
+      <div
+          class="modal"
+          id="modal-messages-sucess"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="modalLabel"
+          aria-hidden="true"
+      >
+        <div
+            class="modal-dialog modal-dialog-centered"
+            style="max-width: max-content;min-width: 500px;"
+            role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>Sucesso</p>
+              <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div
+                class="modal-body alert alert-success"
+                style="max-width:1200px"
+            >
+              <p v-if="messages">
+                {{messages}}
+              </p>
+            </div>
+            <div v-if="status == 2" class="modal-footer">
+              <button
+                  type="submit"
+                  name="action"
+                  class="btn btn-success"
+                  value="create_new"
+                  v-on:click="btnOnClickSelect('create_new')"
+              >
+                <i class="fa fa-check-circle mr-1"></i> Novo carrinho
+              </button>
+              <button
+                  type="submit"
+                  name="action"
+                  class="btn btn-success"
+                  value="back_lists"
+                  v-on:click="btnOnClickSelect('back_lists')"
+              >
+                <i class="fa fa-check-circle mr-1"></i> Ver todos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -225,6 +346,13 @@ export default {
       ids: [],
       arrayFotosSelecionadasTabs: {},
       selectedImages: [],
+      errors: [],
+      messages: '',
+      status: 0,
+      actionSelect: '',
+      name: '',
+      client_id: [],
+      profile_id: [],
       tab: {
         profile: null
       }
@@ -250,10 +378,13 @@ export default {
       this.selectedImages = []
       this.arrayFotos = {}
 
-       let ids = []
+      let ids = []
+      this.profile_id = []
+
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
+        this.profile_id.push(profile.id)
       }
 
       this.getUserPhotos(ids)
@@ -353,6 +484,43 @@ export default {
       let path_partes = foto.split("/");
       let user_id = path_partes[3]
       return user_id
+    },
+    btnOnClickSelect(selectAction){
+      this.actionSelect = selectAction;
+      if(this.actionSelect == "create_new"){
+        window.location.href = "/carts/create";
+      }else if(this.actionSelect == "back_lists"){
+        window.location.href = "/carts";
+      }
+    },
+    updateForm: function (e) {
+      this.loading = true
+      axios.post(`/carts/update/`+ this.cart.id,{
+          name: this.cart.name,
+          profile_id: this.profile_id,
+          client_id: this.cart.client_id,
+          fotos: this.arrayFotos,
+          action: this.actionSelect
+
+        }).then(response=>{
+          this.loading = false
+          this.actionSelect = "";
+          this.messages = "";
+          this.messages = JSON.stringify(response.data.message)
+          this.status = JSON.stringify(response.data.status)
+          $('#modal').modal('hide');
+          $('#modal-messages-sucess').modal('show');
+      }).catch(error=>{
+          this.loading = false
+          if(error.response.status === 422){
+              this.actionSelect = "";
+              this.errors = [];
+              $('#modal').modal('hide');
+              $('#modal-messages-error').modal('show');
+              this.errors = error.response.data.errors;
+          }
+      });
+      e.preventDefault();
     }
   },
 }
