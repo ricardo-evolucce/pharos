@@ -86,34 +86,72 @@ class CartController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CartStoreRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->all();
-        foreach ($data["client_ids"] as $client_id){
+        if ($request->action == 'create_send') {
+
+            $messages = [
+                'name.required' => 'Campo nome é obrigatório',
+                'fotos.required' => 'Selecione pelo menos uma foto',
+                'profile_id.required' => 'Selecione pelo menos uma perfil',
+                'client_ids.required' => 'Selecione pelo menos uma produtora',
+            ];
+
+            $this->validate($request, [
+                'name' => 'required',
+                "fotos" => [
+                    'required',
+                    'array'
+                ],
+                "profile_id" => [
+                    'required',
+                    'array'
+                ],
+                "client_ids" => [
+                    'required',
+                    'array'
+                ],
+            ], $messages);
+        }
+        $errors = 0;
+        $sendEmail = false;
+
+        foreach ($request->client_ids as $client_id){
 
             $dataCreate = array(
                 "client_id" => $client_id,
-                "name" => $data["name"]
+                "name" => $request->name
             );
             $cart = Cart::create($dataCreate);
-            $cart->profiles()->sync($data["profile_id"]);
+            $cart->profiles()->sync($request->profile_id);
             $this->savePDFPhotos($cart, $request->get('fotos'));
-            $message = "O pedido foi salvo na lista de carrinhos!";
 
             if ($request->action == 'create_send') {
+                $sendEmail = true;
                 if (!$this->send($cart)) {
-                    return redirect()->route('carts.index')
-                        ->with('warning', 'Ocorreu um erro ao enviar o pedido!');
+                    $errors++;
+                    $sendEmail = false;
                 }
-
-                $message = "O pedido foi criado e enviado para produtora!";
             }
         }
-
-        return redirect()->route('carts.index')
-            ->with('success', $message);
+        if($errors > 0){
+            return response()->json([
+               'status' => 1,
+               'message'   =>'Ocorreu um erro ao enviar o pedido!'
+            ]);
+        }else if($errors == 0 && $sendEmail){
+            return response()->json([
+                'status' => 2,
+                'message'   =>'O pedido foi criado e enviado para produtora!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 3,
+                'message' =>'O pedido foi salvo na lista de carrinhos!'
+            ]);
+        }
     }
 
     /**
@@ -140,35 +178,88 @@ class CartController extends Controller
         $profiles = Profile::all();
         $selectedProfiles = [];
         $selectedProfilesIds = [];
-//        dd($cart->profiles);
+
         foreach($cart->profiles as $profile) {
             $selectedProfiles[] = $profile;
             $selectedProfilesIds[] = $profile->id;
         }
+
         $profilesSelects = collect($selectedProfiles);
         $profilesSelectsIds = collect($selectedProfilesIds);
-//        dd($profilesSelects);
+
         return view('carts.edit', compact("cart","clients", "profiles", "profilesSelects","profilesSelectsIds"));
     }
 
     /**
-     * Update the specified resource in storage.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Cart  $cart
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     * 1 - Atualiza os dados
+     * 2 - Sincroniza os perfis selecionados
+     * 3 - Remove o diretório anterior
+     * 4 - Cria um novo diretório de pdf e imagens selecionadas
      */
     public function update(Request $request, Cart $cart)
     {
-        $data = $request->all();
-//        dd($cart);
-        $cart->update($data);
-//        foreach ($data["profile_ids"] as $profile_id){
-//           $cart->profiles()->sync($profile_id);
-//        }
 
-        return redirect()->route('carts.index')
-            ->with('success', 'Carrinho atualizado com sucesso!');
+        if ($request->action == 'edit_send') {
+
+            $messages = [
+                'name.required' => 'Campo nome é obrigatório',
+                'fotos.required' => 'Selecione pelo menos uma foto',
+                'profile_id.required' => 'Selecione pelo menos uma perfil',
+                'client_id.required' => 'Selecione pelo menos uma produtora',
+            ];
+
+            $this->validate($request, [
+                'name' => 'required',
+                "fotos" => [
+                    'required',
+                    'array'
+                ],
+                "profile_id" => [
+                    'required',
+                    'array'
+                ],
+                "client_id" => [
+                    'required',
+                ],
+            ], $messages);
+        }
+
+        $dataUpdate = array(
+            "client_id" => $request->client_id,
+            "name" => $request->name
+        );
+
+        $cart->update($dataUpdate);
+
+        $cart->profiles()->sync($request->profile_id);
+        // deleta diretório de pdf e imagens comprimidas
+        $this->deletedirectoryCartProfile($cart);
+        // cria um novo diretório
+        $this->savePDFPhotos($cart, $request->get('fotos'));
+
+        if ($request->action == 'edit_send') {
+            if (!$this->send($cart)) {
+                return response()->json([
+                    'status' => 1,
+                    'message'   =>'Ocorreu um erro ao enviar o pedido!'
+                ]);
+            }
+            return response()->json([
+                'status' => 2,
+                'message'   =>'O carrinho foi atualizado com sucesso e enviado para produtora!!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 3,
+                'message' =>'O pedido foi atualizado na lista de carrinhos!'
+            ]);
+        }
+    }
+    public function deletedirectoryCartProfile($cart){
+        Storage::disk('public')->deleteDirectory("/carts/{$cart->id}");
     }
 
     /**
@@ -201,7 +292,6 @@ class CartController extends Controller
      */
     private function savePDFPhotos(Cart $cart, $profiles_photos){
         if ($cart->profiles->count() > 0) {
-
             try {
                 $path = public_path("uploads/carts/{$cart->id}");
                 File::makeDirectory($path, 0775, true);
@@ -264,7 +354,7 @@ class CartController extends Controller
         // return new \App\Mail\CartProfiles($cart);
 
         try {
-            Mail::to($cart->client->user)->send(new CartProfiles($cart));
+            Mail::to($cart->client->user->email)->send(new CartProfiles($cart));
 
             $cart->sent = true;
             $cart->save();
