@@ -118,12 +118,13 @@ class CartController extends Controller
         $errors = 0;
         $sendEmail = false;
 
+        dd($request->client_ids);
         foreach ($request->client_ids as $client_id){
-
             $dataCreate = array(
                 "client_id" => $client_id,
                 "name" => $request->name
             );
+            dd($dataCreate);
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
             $this->savePDFPhotos($cart, $request->get('fotos'));
@@ -136,6 +137,7 @@ class CartController extends Controller
                 }
             }
         }
+        dd($errors);
         if($errors > 0){
             return response()->json([
                'status' => 1,
