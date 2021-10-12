@@ -117,7 +117,6 @@ class CartController extends Controller
         }
         $errors = 0;
         $sendEmail = false;
-
         foreach ($request->client_ids as $client_id){
             $dataCreate = array(
                 "client_id" => $client_id,
@@ -200,7 +199,6 @@ class CartController extends Controller
      */
     public function update(Request $request, Cart $cart)
     {
-
         if ($request->action == 'edit_send') {
 
             $messages = [
@@ -304,7 +302,7 @@ class CartController extends Controller
                     $fotos_grupos = [];
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
-                            $foto = $this->createThumbnail(public_path($fotos[$i]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);  //sempre a primeira do array
+                            $foto = $this->createThumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);  //sempre a primeira do array
                             array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal

@@ -236,7 +236,6 @@
               :value="foto.src"
               checked
             >
-
           </template>
 
         </form>
@@ -483,7 +482,7 @@ export default {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
-          fotos: this.arrayFotos,
+          fotos: this.arrayFotosSelecionadasTabs,
           action: this.actionSelect
       }).then(response =>{
         this.loading = false

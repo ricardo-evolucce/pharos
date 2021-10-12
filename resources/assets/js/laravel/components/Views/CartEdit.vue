@@ -499,7 +499,7 @@ export default {
           name: this.cart.name,
           profile_id: this.profile_id,
           client_id: this.cart.client_id,
-          fotos: this.arrayFotos,
+          fotos: this.arrayFotosSelecionadasTabs,
           action: this.actionSelect
 
         }).then(response=>{
