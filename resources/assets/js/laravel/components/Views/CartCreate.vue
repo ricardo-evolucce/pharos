@@ -365,8 +365,9 @@ export default {
       arrayFotos: {},
       arrayFotosTab: [],
       arrayFotosSelecionadasTabs: {},
-      // arrayFotosSelecionadasSendTabs: [],
+      arrayFotosSelecionadasSendTabs: {},
       selectedImages: [],
+      selectedAuxImages: [],
       errors: [],
       messages: '',
       status: 0,
@@ -419,29 +420,17 @@ export default {
               }
             }
             this.selectedImages = objeto_fotos
-            this.montarArrayFotosEditSelecionadas(objeto_fotos)
+            this.montarArrayFotosSelecionadas(objeto_fotos)
             this.clickTab(this.new_cart[0])
           })
           .finally(() => {
             this.loading = false
           })
     },
-    // montarArrayFotosSelecionadas(fotos){
-    //   let aux = {}
-    //   for (const i in fotos) {
-    //     const foto = fotos[i];
-    //     let user_id = this.pegarUserIdPelaFoto(foto.src)
-    //     if(!aux.hasOwnProperty(user_id)){
-    //       aux[user_id] = []
-    //     }
-    //
-    //     aux[user_id].push(foto)
-    //   }
-    //   this.arrayFotosSelecionadasTabs = aux
-    // },
-    montarArrayFotosEditSelecionadas(fotos){
+
+    montarArrayFotosSelecionadas(fotos){
       let aux = {}
-      let aux2 = {}
+      this.arrayFotosSelecionadasSendTabs = {}
 
       // verificar se a img de fotos estão contidas no selectedImage
       // o que não tiver removo do selectImage
@@ -450,35 +439,34 @@ export default {
           this.selectedImages.splice(y, 1);
         }
       }
+
+      // pego os usuarios das fotos selecionadas
       for (const y in this.selectedImages) {
+
         let user_id = this.pegarUserIdPelaFoto(this.selectedImages[y].src)
         if (!aux.hasOwnProperty(user_id)) {
           aux[user_id] = []
         }
         aux[user_id].push(this.selectedImages[y])
+        // alimento o objeto com as fotos selecionadas
         this.arrayFotosSelecionadasTabs = aux
-      }
-      // this.arrayFotosSelecionadasSendTabs.push(aux)
-
-      for (const i in fotos) {
-          if(!this.selectedImages.includes(fotos[i])) {
-            this.selectedImages.push(fotos[i])
-            // let user_id = this.pegarUserIdPelaFoto(fotos[i].src)
-            // if (!aux2.hasOwnProperty(user_id)) {
-            //   aux2[user_id] = []
-            // }
-            // aux2[user_id].push(fotos[i])
-            //
-            // this.arrayFotosSelecionadasTabs = aux
-          }
+        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id)) {
+          this.arrayFotosSelecionadasSendTabs[user_id] = []
         }
-      // this.arrayFotosSelecionadasSendTabs.push(aux2)
-
-    },
+        this.arrayFotosSelecionadasSendTabs[user_id].push(this.selectedImages[y])
+      }
+      if(!this.selectedImages.includes(fotos[JSON.stringify(fotos.length) -1])) {
+            this.selectedImages.push(fotos[JSON.stringify(fotos.length) -1])
+            let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[JSON.stringify(fotos.length) -1].src).replace(/"/g, ""))
+            if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
+              this.arrayFotosSelecionadasSendTabs[user_id_2] = []
+            }
+            this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[JSON.stringify(fotos.length) -1])
+          }
+      },
     onselectmultipleimage (fotos) {
       this.arrayFotosSelecionadasTabs = {}
-      // this.arrayFotosSelecionadasSendTabs = []
-      this.montarArrayFotosEditSelecionadas(fotos)
+      this.montarArrayFotosSelecionadas(fotos)
     },
     clickTab (profile) {
       this.tab.profile = profile
@@ -487,19 +475,6 @@ export default {
     exibirFotosTab () {
       this.loading = true
       this.arrayFotosTab = []
-
-      // for (const y in this.arrayFotos) {
-      //   for (const a in this.arrayFotos[y]) {
-      //     console.log("DEV_DEBUG_PHOTOS", this.arrayFotos[y][a]);
-      //     console.log("DEV_DEBUG_PHOTOS>>>>", JSON.stringify(this.selectedImages[0]));
-      //
-      //      if (!this.selectedImages.includes(this.arrayFotos[y][a])) {
-      //        console.log("DEV_DEBUG_FOTOS >>>>> NAO EXISTE ITEM DELETADO", this.arrayFotos[y][a]);
-      //        this.arrayFotos[y].splice(this.arrayFotos[y][a], 1);
-      //      }
-      //   }
-      // }
-
 
       let user_id = this.tab.profile.user_id
       let fotos_perfil = this.arrayFotos[user_id]
@@ -532,7 +507,8 @@ export default {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
-          fotos: this.arrayFotosSelecionadasTabs,
+          // fotos: this.arrayFotosSelecionadasTabs,
+          fotos: this.arrayFotosSelecionadasSendTabs,
           action: this.actionSelect
       }).then(response =>{
         this.loading = false
