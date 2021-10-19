@@ -224,7 +224,6 @@ class CartController extends Controller
                 ],
             ], $messages);
         }
-
         $dataUpdate = array(
             "client_id" => $request->client_id,
             "name" => $request->name,
@@ -304,7 +303,7 @@ class CartController extends Controller
                     $fotos_grupos = [];
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
-                            $foto = $this->createThumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);  //sempre a primeira do array
+                            $foto = $this->createThumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);
                             array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal
