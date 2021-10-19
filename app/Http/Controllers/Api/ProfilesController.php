@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Cart;
 use App\Http\Controllers\Controller;
 use App\Media;
 use Illuminate\Http\Request;
@@ -56,7 +57,6 @@ class ProfilesController extends Controller
 
         return $profiles;
     }
-
     public function userPhotos(Request $request)
     {
         $ids = request('ids');
@@ -65,7 +65,6 @@ class ProfilesController extends Controller
             foreach ($ids as $key => $user_id) {
                 $path = public_path(implode(DIRECTORY_SEPARATOR, ['uploads','profiles',$user_id]));
                 $photos = Media::where('entity_id', $user_id)->orderBy('order','desc')->get()->toArray();
-
                 $files = array_map(function($photo) use ($path) {
                     return $path.DIRECTORY_SEPARATOR.$photo['path'];
                 }, $photos);
@@ -73,10 +72,29 @@ class ProfilesController extends Controller
                 foreach ($files as $key => $file) {
                     $path_temp = str_replace(public_path(),'', $file);
                     $array[$user_id][] = $path_temp;
+
                 }
             }
         }
         return $array;
     }
-
+    public function userPhotosCarts(Request $request)
+    {
+        $idCart = request('id');
+        $cart = Cart::where('id', $idCart)->with('profiles')->get()->toArray();
+        $array = [];
+        if($idCart){
+            foreach ($cart[0]["profiles"] as $profile){
+                foreach (unserialize($cart[0]["photos_select"]) as $photos){
+                    foreach ($photos as $photo){
+                        $arrayUser = explode('/', $photo["src"]);
+                       if($profile["user_id"] = intval($arrayUser[3])){
+                          $array[$profile["user_id"]][] = $photo["src"];
+                        }
+                    }
+                }
+            }
+        }
+        return $array;
+    }
 }

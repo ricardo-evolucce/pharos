@@ -120,7 +120,8 @@ class CartController extends Controller
         foreach ($request->client_ids as $client_id){
             $dataCreate = array(
                 "client_id" => $client_id,
-                "name" => $request->name
+                "name" => $request->name,
+                "photos_select" => serialize($request->get('fotos'))
             );
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
@@ -226,7 +227,8 @@ class CartController extends Controller
 
         $dataUpdate = array(
             "client_id" => $request->client_id,
-            "name" => $request->name
+            "name" => $request->name,
+            "photos_select" => serialize($request->get('fotos'))
         );
 
         $cart->update($dataUpdate);

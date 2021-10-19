@@ -132,7 +132,7 @@
                       >
                         <!-- {{arrayFotos}} -->
                         <!--{{arrayFotosSelecionadasTabs}}-->
-                         {{selectedImages}}
+                        <!--{{selectedImages}}-->
                         <!-- TABS -->
                         <nav>
                           <div
@@ -432,7 +432,7 @@ export default {
       let aux = {}
       this.arrayFotosSelecionadasSendTabs = {}
 
-      // verificar se a img de fotos estão contidas no selectedImage
+      // verificar se as fotos estão contidas no selectedImage
       // o que não tiver removo do selectImage
       for (const y in this.selectedImages) {
         if (!fotos.includes(this.selectedImages[y])) {
@@ -507,7 +507,6 @@ export default {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
-          // fotos: this.arrayFotosSelecionadasTabs,
           fotos: this.arrayFotosSelecionadasSendTabs,
           action: this.actionSelect
       }).then(response =>{

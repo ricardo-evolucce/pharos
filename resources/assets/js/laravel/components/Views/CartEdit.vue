@@ -345,6 +345,7 @@ export default {
       arrayFotosTab: [],
       ids: [],
       arrayFotosSelecionadasTabs: {},
+      arrayFotosSelecionadasSendTabs: {},
       selectedImages: [],
       errors: [],
       messages: '',
@@ -365,7 +366,7 @@ export default {
     this.fotosEscolhidas();
   },
   methods: {
-    ...mapActions(['getUserPhotos','toggleItemNewCart']),
+    ...mapActions(['getUserPhotos','getUserPhotosCarts','toggleItemNewCart']),
     fotoParaObjetoFoto(foto){
       return {
         id: `${foto}`,
@@ -386,21 +387,24 @@ export default {
         ids.push(profile.user_id)
         this.profile_id.push(profile.id)
       }
+      this.getUserPhotosCarts(JSON.stringify(this.cart.id))
+          .then(cart_select_photos => {
+            let objeto_fotos_select = []
+            for (const i in cart_select_photos) {
+              const fotos = cart_select_photos[i];
+              for (const j in fotos) {
+                const foto = fotos[j];
+                objeto_fotos_select.push(this.fotoParaObjetoFoto(foto))
+              }
+            }
+            this.selectedImages = objeto_fotos_select
+            this.montarArrayFotosSelecionadas(objeto_fotos_select)
+
+          })
 
       this.getUserPhotos(ids)
           .then(perfis_fotos => {
             this.arrayFotos = perfis_fotos
-            let objeto_fotos = []
-            for (const i in perfis_fotos) {
-              const fotos = perfis_fotos[i];
-              for (const j in fotos) {
-                const foto = fotos[j];
-                objeto_fotos.push(this.fotoParaObjetoFoto(foto))
-              }
-            }
-
-            this.selectedImages = objeto_fotos
-            this.montarArrayFotosSelecionadas(objeto_fotos)
             this.clickTab(this.new_cart[0])
           })
           .finally(() => {
@@ -430,7 +434,6 @@ export default {
                   }
 
                   this.selectedImages = objeto_fotos
-                  console.log("imagens 3 objeto", this.selectedImages);
                   this.montarArrayFotosSelecionadas(objeto_fotos)
 
                   this.clickTab(this.new_cart[0])
@@ -444,16 +447,38 @@ export default {
 
     montarArrayFotosSelecionadas(fotos){
       let aux = {}
-      for (const i in fotos) {
-        const foto = fotos[i];
-        let user_id = this.pegarUserIdPelaFoto(foto.src)
-        if(!aux.hasOwnProperty(user_id)){
+      this.arrayFotosSelecionadasSendTabs = {}
+      // verificar se a img de fotos estão contidas no selectedImage
+      // o que não tiver removo do selectImage
+      for (const y in this.selectedImages) {
+        if (!fotos.includes(this.selectedImages[y])) {
+          this.selectedImages.splice(y, 1);
+        }
+      }
+
+      // pego os usuarios das fotos selecionadas
+      for (const y in this.selectedImages) {
+
+        let user_id = this.pegarUserIdPelaFoto(this.selectedImages[y].src)
+        if (!aux.hasOwnProperty(user_id)) {
           aux[user_id] = []
         }
-
-        aux[user_id].push(foto)
+        aux[user_id].push(this.selectedImages[y])
+        // alimento o objeto com as fotos selecionadas
+        this.arrayFotosSelecionadasTabs = aux
+        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id)) {
+          this.arrayFotosSelecionadasSendTabs[user_id] = []
+        }
+        this.arrayFotosSelecionadasSendTabs[user_id].push(this.selectedImages[y])
       }
-      this.arrayFotosSelecionadasTabs = aux
+      if(!this.selectedImages.includes(fotos[JSON.stringify(fotos.length) -1])) {
+        this.selectedImages.push(fotos[JSON.stringify(fotos.length) -1])
+        let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[JSON.stringify(fotos.length) -1].src).replace(/"/g, ""))
+        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
+          this.arrayFotosSelecionadasSendTabs[user_id_2] = []
+        }
+        this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[JSON.stringify(fotos.length) -1])
+      }
     },
     onselectmultipleimage (fotos) {
       this.arrayFotosSelecionadasTabs = {}
@@ -499,7 +524,7 @@ export default {
           name: this.cart.name,
           profile_id: this.profile_id,
           client_id: this.cart.client_id,
-          fotos: this.arrayFotosSelecionadasTabs,
+          fotos: this.arrayFotosSelecionadasSendTabs,
           action: this.actionSelect
 
         }).then(response=>{
