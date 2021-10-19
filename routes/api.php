@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('profiles', 'Api\ProfilesController@index');
 Route::get('profiles/userPhotos', 'Api\ProfilesController@userPhotos');
+Route::get('profiles/userPhotosCarts', 'Api\ProfilesController@userPhotosCarts');
 
 Route::group(['prefix' => 'site'], function(){
     Route::post('login-agenciado', 'Api\HelperController@getLoginAgenciado');

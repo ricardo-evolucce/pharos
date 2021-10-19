@@ -83,15 +83,11 @@ class ProfilesController extends Controller
         $idCart = request('id');
         $cart = Cart::where('id', $idCart)->with('profiles')->get()->toArray();
         $array = [];
-        if($idCart){
-            foreach ($cart[0]["profiles"] as $profile){
-                foreach (unserialize($cart[0]["photos_select"]) as $photos){
-                    foreach ($photos as $photo){
-                        $arrayUser = explode('/', $photo["src"]);
-                       if($profile["user_id"] = intval($arrayUser[3])){
-                          $array[$profile["user_id"]][] = $photo["src"];
-                        }
-                    }
+            if($idCart && $cart){
+            foreach (unserialize($cart[0]["photos_select"]) as $photos){
+                foreach ($photos as $photo){
+                   $arrayUser = explode('/', $photo["src"]);
+                   $array[intval($arrayUser[3])][] = $photo["src"];
                 }
             }
         }

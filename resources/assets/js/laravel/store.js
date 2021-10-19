@@ -41,6 +41,15 @@ let store = {
           .catch(error => reject(error));
       })
     },
+    getUserPhotosCarts ({ commit, state }, id) {
+      return new Promise((resolve, reject) => {
+        axios.get('/api/profiles/userPhotosCarts', { params: { id } })
+          .then(response => {
+            resolve(response.data)
+          })
+          .catch(error => reject(error));
+      })
+    },
     getProfiles ({ commit, state }) {
       axios.get('/api/profiles', { params: state.filters }).then(response => {
         commit('setProfiles', response.data);
