@@ -503,11 +503,11 @@ export default {
       this.loading = false
     },
     pegarUserIdPelaFoto(foto){
-      // let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
-      // let user_id = path_partes[path_partes.length - 2]
+      let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
+      let user_id = path_partes[path_partes.length - 2]
 
-      let path_partes = foto.split("/");
-      let user_id = path_partes[3]
+      //let path_partes = foto.split("/");
+      //let user_id = path_partes[3]
       return user_id
     },
     btnOnClickSelect(selectAction){
