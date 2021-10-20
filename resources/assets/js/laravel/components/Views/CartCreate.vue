@@ -444,6 +444,7 @@ export default {
       for (const y in this.selectedImages) {
 
         let user_id = this.pegarUserIdPelaFoto(this.selectedImages[y].src)
+        console.log("DEV_DEBUG_USER", user_id);
         if (!aux.hasOwnProperty(user_id)) {
           aux[user_id] = []
         }
@@ -487,10 +488,15 @@ export default {
       this.loading = false
     },
     pegarUserIdPelaFoto(foto){
+      let user_id = "";
       let path_partes = foto.split(this.DIRECTORY_SEPARATOR)
-      let user_id = path_partes[path_partes.length - 2]
-      //let path_partes = foto.split("/");
-      //let user_id = path_partes[3]
+      user_id = path_partes[path_partes.length - 2]
+
+      if(typeof user_id == 'undefined') {
+        let path_partes = foto.split("/");
+        user_id = path_partes[3]
+      }
+
       return user_id
     },
     btnOnClickSelect(selectAction){
