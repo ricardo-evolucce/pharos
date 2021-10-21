@@ -117,6 +117,7 @@ class CartController extends Controller
         }
         $errors = 0;
         $sendEmail = false;
+
         foreach ($request->client_ids as $client_id){
             $dataCreate = array(
                 "client_id" => $client_id,
@@ -300,10 +301,13 @@ class CartController extends Controller
                 foreach ($cart->profiles as $profile) {
                     $name = str_slug($profile->user->name);
                     $fotos = $profiles_photos[$profile->user_id];
+                    return_dimension(public_path($fotos[0]["src"]));
+
                     $fotos_grupos = [];
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
-                            $foto = $this->createThumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", 250,375);
+                            $dimensions = return_dimension(public_path($fotos[$i]["src"]));
+                            $foto = create_thumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", $dimensions["width"], $dimensions["height"]);
                             array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal
@@ -317,11 +321,7 @@ class CartController extends Controller
             }
         }
     }
-    private function createThumbnail($path,$output_file_compress, $width, $height)
-    {
-        $newPath = Image::make($path)->resize($width, $height)->save($output_file_compress);
-        return $newPath;
-    }
+
     private function savePDF(Cart $cart)
     {
         if ($cart->profiles->count() > 0) {
@@ -407,24 +407,9 @@ class CartController extends Controller
             File::makeDirectory($pathNew, 0775, true);
         }
 
-        $this->recurse_copy($path, $pathNew);
+        recurse_copy($path, $pathNew);
 
         return redirect()->route('carts.index')
             ->with('success', 'Carrinho duplicado com sucesso!');
-    }
-    public function recurse_copy($src,$dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                if (is_dir($src . '/' . $file) ) {
-                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
-                }
-                else {
-                    copy($src . '/' . $file,$dst . '/' . $file);
-                }
-            }
-        }
-        closedir($dir);
     }
 }
