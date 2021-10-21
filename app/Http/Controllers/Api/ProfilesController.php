@@ -86,7 +86,10 @@ class ProfilesController extends Controller
             if($idCart && $cart){
             foreach (unserialize($cart[0]["photos_select"]) as $photos){
                 foreach ($photos as $photo){
-                   $arrayUser = explode('/', $photo["src"]);
+                   $arrayUser = explode('\\', $photo["src"]);
+                   if(!isset($arrayUser[3]) && empty(isset($arrayUser[3]))){
+                       $arrayUser = explode('/', $photo["src"]);
+                   }
                    $array[intval($arrayUser[3])][] = $photo["src"];
                 }
             }
