@@ -181,5 +181,8 @@ class Profile extends Model
     static function randonSelection(){
         return parent::orderBy( \DB::raw('RAND()') );
     }
-
+    public function imgs_compress_path()
+    {
+        return $this->hasMany(ImgCompressPath::class, 'profile_id');
+    }
 }

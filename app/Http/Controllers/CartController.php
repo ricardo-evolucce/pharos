@@ -6,6 +6,7 @@ use App\Cart;
 use App\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CartStoreRequest;
+use App\ImgCompressPath;
 use App\Mail\CartProfiles;
 use App\Profile;
 use Exception;
@@ -294,21 +295,38 @@ class CartController extends Controller
             try {
                 $path = public_path("uploads/carts/{$cart->id}");
                 File::makeDirectory($path, 0775, true);
-                // cria diretorio de imgs comprimidas
-                $pathImgCompress = $path."/min/";
-                File::makeDirectory($pathImgCompress, 0775, true);
 
                 foreach ($cart->profiles as $profile) {
                     $name = str_slug($profile->user->name);
                     $fotos = $profiles_photos[$profile->user_id];
-                    return_dimension(public_path($fotos[0]["src"]));
 
                     $fotos_grupos = [];
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
-                            $dimensions = return_dimension(public_path($fotos[$i]["src"]));
-                            $foto = create_thumbnail(public_path($fotos[$i]["src"]), $pathImgCompress."/img-".$i."-compress.jpg", $dimensions["width"], $dimensions["height"]);
-                            array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
+                            if($i <= 4){
+                                  $dataPhoto = explode("/", $fotos[$i]["src"]);
+                                  $imgCompress = ImgCompressPath::where('profile_id', $profile->id)
+                                                                ->where('img_name', $dataPhoto[4])
+                                                                ->first();
+                                  if($imgCompress == null){
+                                      create_dir_comp($profile->user_id);
+
+                                      $imgPath = "uploads/profiles/{$profile->user_id}/compress";
+                                      $dimensions = return_dimension(public_path($fotos[$i]["src"]));
+                                      $foto = create_thumbnail(public_path($fotos[$i]["src"]), $imgPath."/comp-".$dataPhoto[4], $dimensions["width"], $dimensions["height"]);
+                                      array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
+
+                                      $imgCompress = array(
+                                          "url_compress" => $foto->dirname."/".$foto->basename,
+                                          "img_name" => $dataPhoto[4],
+                                          "profile_id" => $profile->id
+                                      );
+
+                                      ImgCompressPath::create($imgCompress);
+                                  }else{
+                                      array_push($fotos_grupos, $imgCompress->url_compress);
+                                  }
+                            }
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal
                         unset($fotos_grupos[0]); // remove a primeira foto do array

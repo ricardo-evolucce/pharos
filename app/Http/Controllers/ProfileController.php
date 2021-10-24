@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileStore;
 use App\Http\Requests\ProfileUpdate;
+use App\ImgCompressPath;
 use App\Media;
 use App\Profile;
 use App\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -76,20 +78,17 @@ class ProfileController extends Controller
      */
     public function store(ProfileStore $request)
     {
+
         $request->merge(['password' => bcrypt('minhaagencia10')]);
         $user = User::create($request->all());
 
         $profile = new Profile;
         $request->merge(['slug' => str_slug($request->fancy_name)]);
         $profile->fill($request->all());
-
         $user->profile()->save($profile);
 
         if ($request->hasFile('images') && is_array($request->images)) {
             foreach ($request->images as $image) {
-
-
-
                 $media = new Media;
                 $path = $image->store("profiles/{$user->profile->user_id}", 'public');
 
@@ -100,6 +99,7 @@ class ProfileController extends Controller
                 $media->type = "image";
 
                 $thumb = Image::make($image);
+
                 $thumb->fit(200, 200, function ($constraint) {
                     $constraint->upsize();
                 });
@@ -109,8 +109,22 @@ class ProfileController extends Controller
                 }
 
                 $thumb->save("uploads/profiles/{$user->profile->user_id}/thumb/{$mediaName}");
-
                 $user->profile->medias()->save($media);
+
+                create_dir_comp($user->profile->user_id);
+
+                $imgPath = "uploads/profiles/{$user->profile->user_id}/compress";
+                // gera imagem comprimida
+                $dimensions = return_dimension(public_path("uploads/profiles/{$user->profile->user_id}/{$mediaName}"));
+                $foto = create_thumbnail(public_path("uploads/profiles/{$user->profile->user_id}/{$mediaName}"), $imgPath."/comp-".$mediaName, $dimensions["width"], $dimensions["height"]);
+
+                $imgCompress = array(
+                    "url_compress" => $foto->dirname."/".$foto->basename,
+                    "img_name" => $image->getClientOriginalName(),
+                    "profile_id" => $profile->id
+               );
+
+                ImgCompressPath::create($imgCompress);
             }
         }
 
@@ -194,6 +208,28 @@ class ProfileController extends Controller
                 $thumb->save("uploads/profiles/{$user->profile->user_id}/thumb/{$mediaName}");
 
                 $user->profile->medias()->save($media);
+
+
+                $imgCompress = ImgCompressPath::where('profile_id', $profile->id)
+                    ->where('img_name', $image->getClientOriginalName())
+                    ->first();
+
+                if($imgCompress == null){
+                    create_dir_comp($user->profile->user_id);
+
+                    $imgPath = "uploads/profiles/{$user->profile->user_id}/compress";
+                    // gera imagem comprimida
+                    $dimensions = return_dimension(public_path("uploads/profiles/{$user->profile->user_id}/{$mediaName}"));
+                    $foto = create_thumbnail(public_path("uploads/profiles/{$user->profile->user_id}/{$mediaName}"), $imgPath."/comp-".$mediaName, $dimensions["width"], $dimensions["height"]);
+
+                    $imgCompress = array(
+                        "url_compress" => $foto->dirname."/".$foto->basename,
+                        "img_name" => $image->getClientOriginalName(),
+                        "profile_id" => $profile->id
+                    );
+
+                    ImgCompressPath::create($imgCompress);
+                }
             }
         }
 
@@ -212,11 +248,8 @@ class ProfileController extends Controller
         //
     }
 
-
-
-     public function delete(Request $profile)
+    public function delete(Request $profile)
     {
-
 
         //obtem dados do profile
         $profileApagado = Profile::find($profile->id);  
@@ -224,23 +257,13 @@ class ProfileController extends Controller
         //obtem dados do usuario      
         $usuarioApagado = User::find($profileApagado->user_id);
 
-
         $usuarioApagado->delete();
         $profileApagado->delete();
 
         Storage::disk('public')->deleteDirectory("/profiles/{$profileApagado->user_id}");
 
-        
-        
-      
-        
-
         return redirect()->route('profiles.index')
             ->with('success', 'Agenciado excluido com sucesso!'); 
-        
-
-
-
 
     }
 
