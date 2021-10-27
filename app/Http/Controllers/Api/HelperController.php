@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Favorito;
+use App\ImgCompressPath;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use File;
@@ -211,7 +212,6 @@ class HelperController extends Controller
         $imageName = time().'.'.request()->file->getClientOriginalExtension();
         request()->file->move( public_path('uploads/profiles/' . $request->get('user_id') ), $imageName);
 
-        // dd($this->media_fields());
         $data = [
             'entity_id' => $request->get('user_id'),
             'entity_type' => 'App\Profile',
@@ -226,6 +226,28 @@ class HelperController extends Controller
             Media::where(['entity_id' => $request->get('user_id'), 'order' => 99])->update($data);
         } else {
             Media::insert($data);
+        }
+
+        $imgCompress = ImgCompressPath::where('user_id', $request->get('user_id'))
+            ->where('img_name', $imageName)
+            ->first();
+
+        if($imgCompress == null) {
+
+            create_dir_comp($request->get('user_id'));
+
+            $imgPath = "uploads/profiles/{$request->get('user_id')}/compress";
+            // gera imagem comprimida
+            $dimensions = return_dimension(public_path("uploads/profiles/{$request->get('user_id')}/{$imageName}"));
+            $foto = create_thumbnail(public_path("uploads/profiles/{$request->get('user_id')}/{$imageName}"), $imgPath . "/comp-" . $imageName, $dimensions["width"], $dimensions["height"]);
+
+            $imgCompress = array(
+                "url_compress" => $foto->dirname . "/" . $foto->basename,
+                "img_name" => $imageName,
+                "user" => $request->get('user_id')
+            );
+
+            ImgCompressPath::create($imgCompress);
         }
 
         return response()->json(['success' => $data]);
@@ -256,13 +278,6 @@ class HelperController extends Controller
         $order = Media::where('entity_id', $request->get('user_id'))->count();
         $imageName = time().'.'.request()->file->getClientOriginalExtension();
         request()->file->move( public_path('uploads/profiles/' . $request->get('user_id') ), $imageName);
-
-
-
-
-
-
-
 
             $image = 'uploads/profiles/'.$request->get('user_id').'/'.$imageName;
 
@@ -310,6 +325,30 @@ class HelperController extends Controller
         ];
 
         $media = Media::insert($data);
+
+
+        $imgCompress = ImgCompressPath::where('user_id', $request->get('user_id'))
+            ->where('img_name', $imageName)
+            ->first();
+
+        if($imgCompress == null) {
+
+            create_dir_comp($request->get('user_id'));
+
+            $imgPath = "uploads/profiles/{$request->get('user_id')}/compress";
+            // gera imagem comprimida
+            $dimensions = return_dimension(public_path("uploads/profiles/{$request->get('user_id')}/{$imageName}"));
+            $foto = create_thumbnail(public_path("uploads/profiles/{$request->get('user_id')}/{$imageName}"), $imgPath . "/comp-" . $imageName, $dimensions["width"], $dimensions["height"]);
+
+            $imgCompress = array(
+                "url_compress" => $foto->dirname . "/" . $foto->basename,
+                "img_name" => $imageName,
+                "user" => $request->get('user_id')
+            );
+
+            ImgCompressPath::create($imgCompress);
+        }
+
 
         return response()->json(['success' => $data]);
     }
