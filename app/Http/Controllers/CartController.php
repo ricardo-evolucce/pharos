@@ -304,7 +304,11 @@ class CartController extends Controller
                     if($fotos){
                         for ($i=0; $i < count($fotos); $i++) {
                             if($i <= 4){
-                                  $dataPhoto = explode("/", $fotos[$i]["src"]);
+                                  $dataPhoto = explode("\\", $fotos[$i]["src"]);
+                                  if(count($dataPhoto) == 1){
+                                      $dataPhoto = explode("/", $fotos[$i]["src"]);
+                                  }
+
                                   $imgCompress = ImgCompressPath::where('profile_id', $profile->id)
                                                                 ->where('img_name', $dataPhoto[4])
                                                                 ->first();
