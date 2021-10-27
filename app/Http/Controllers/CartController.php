@@ -309,10 +309,11 @@ class CartController extends Controller
                                       $dataPhoto = explode("/", $fotos[$i]["src"]);
                                   }
 
-                                  $imgCompress = ImgCompressPath::where('profile_id', $profile->id)
+                                  $imgCompress = ImgCompressPath::where('user_id', $profile->user_id)
                                                                 ->where('img_name', $dataPhoto[4])
                                                                 ->first();
-                                  if($imgCompress == null){
+
+                                if($imgCompress == null){
                                       create_dir_comp($profile->user_id);
 
                                       $imgPath = "uploads/profiles/{$profile->user_id}/compress";

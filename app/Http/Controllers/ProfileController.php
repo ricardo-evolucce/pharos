@@ -210,7 +210,7 @@ class ProfileController extends Controller
                 $user->profile->medias()->save($media);
 
 
-                $imgCompress = ImgCompressPath::where('profile_id', $profile->id)
+                $imgCompress = ImgCompressPath::where('user_id', $user->profile->user_id)
                     ->where('img_name', $image->getClientOriginalName())
                     ->first();
 
