@@ -319,7 +319,7 @@ class CartController extends Controller
                                       $imgCompress = array(
                                           "url_compress" => $foto->dirname."/".$foto->basename,
                                           "img_name" => $dataPhoto[4],
-                                          "profile_id" => $profile->id
+                                          "user_id" => $profile->user_id
                                       );
 
                                       ImgCompressPath::create($imgCompress);

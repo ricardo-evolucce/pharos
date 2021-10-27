@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class ImgCompressPath extends Model
 {
     protected $fillable = [
-        'profile_id',
+        'user_id',
         'url_compress',
         'img_name',
     ];
 
-    public function profile()
+    public function user()
     {
-        return $this->belongsTo(Profile::class, 'profile_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -72,4 +72,8 @@ class User extends Authenticatable
         return ['message' => 'notfound'];
 
     }
+    public function imgs_compress_path()
+    {
+        return $this->hasMany(ImgCompressPath::class, 'user_id');
+    }
 }

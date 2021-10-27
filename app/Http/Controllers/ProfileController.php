@@ -121,7 +121,7 @@ class ProfileController extends Controller
                 $imgCompress = array(
                     "url_compress" => $foto->dirname."/".$foto->basename,
                     "img_name" => $image->getClientOriginalName(),
-                    "profile_id" => $profile->id
+                    "user_id" => $user->profile->user_id
                );
 
                 ImgCompressPath::create($imgCompress);

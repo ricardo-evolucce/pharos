@@ -18,11 +18,11 @@ class CreateImgCompressPathsTable extends Migration
             $table->string('url_compress');
             $table->string('img_name');
 
-            $table->integer('profile_id')->unsigned();
+            $table->integer('user_id')->unsigned()->nullable();
 
 
-            $table->foreign('profile_id')
-                ->references('id')->on('profiles')
+            $table->foreign('user_id')
+                ->references('id')->on('users')
                 ->onDelete('cascade');
 
             $table->timestamps();
