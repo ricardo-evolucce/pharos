@@ -43,6 +43,7 @@
             </div>
         @endif
 
+        @include('carts/include/filter_carts')
 
         <div class="block block-rounded block-bordered">
             <div class="block-header block-header-default">
@@ -166,4 +167,11 @@
 @endsection
 @section('js_after')
     <script>jQuery(function(){ Dashmix.helpers(['table-tools-checkable', 'table-tools-sections']); });</script>
+    <script type="text/javascript" src="js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(function () {
+            $('.datepicker').datepicker({
+            });
+        });
+    </script>
 @stop

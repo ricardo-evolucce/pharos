@@ -9,8 +9,10 @@ use App\Http\Requests\CartStoreRequest;
 use App\ImgCompressPath;
 use App\Mail\CartProfiles;
 use App\Profile;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -26,11 +28,22 @@ class CartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $carts = Cart::orderBy('created_at', 'desc')->paginate(15);
+        $query = Cart::query();
 
-        return view('carts.index', compact('carts'));
+        if(isset($request->client_id) && !empty($request->client_id)){
+            $query->where('client_id', '=', $request->client_id);
+        }
+
+        if(isset($request->created_date) && !empty($request->created_date)){
+            $query->whereDate('created_at', '=', Carbon::createFromFormat('d/m/Y', $request->created_date)->format('Y-m-d'));
+        }
+
+        $carts = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        $clients = Client::all();
+        return view('carts.index', compact('carts','clients'));
     }
 
     /**
@@ -312,24 +325,22 @@ class CartController extends Controller
                                   $imgCompress = ImgCompressPath::where('user_id', $profile->user_id)
                                                                 ->where('img_name', $dataPhoto[4])
                                                                 ->first();
-
                                 if($imgCompress == null){
                                       create_dir_comp($profile->user_id);
-
                                       $imgPath = "uploads/profiles/{$profile->user_id}/compress";
                                       $dimensions = return_dimension(public_path($fotos[$i]["src"]));
+
                                       $foto = create_thumbnail(public_path($fotos[$i]["src"]), $imgPath."/comp-".$dataPhoto[4], $dimensions["width"], $dimensions["height"]);
                                       array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
-
                                       $imgCompress = array(
                                           "url_compress" => $foto->dirname."/".$foto->basename,
                                           "img_name" => $dataPhoto[4],
                                           "user_id" => $profile->user_id
                                       );
-
                                       ImgCompressPath::create($imgCompress);
                                   }else{
-                                      array_push($fotos_grupos, $imgCompress->url_compress);
+
+                                    array_push($fotos_grupos, $imgCompress->url_compress);
                                   }
                             }
                         }
