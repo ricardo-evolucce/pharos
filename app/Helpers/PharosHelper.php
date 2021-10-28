@@ -16,8 +16,8 @@ if (!function_exists('return_dimension')) {
         $imageSize = getimagesize($image);
         $width = $imageSize[0];
         $height = $imageSize[1];
-        $widthNew = 0;
-        $heightNew = 0;
+        $widthNew = 250;
+        $heightNew = 250;
 
         if($width > $height){
             $widthNew = 250;
