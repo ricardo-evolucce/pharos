@@ -20,12 +20,10 @@
                     <input
                       type="text"
                       class="form-control"
-                      id="name"
-                      name="name"
                       v-model="cart.name"
                     >
                   </div>
-                  <select class="custom-select" id="client_id" name="client_id">
+                  <select class="custom-select" v-model="cart.client_id">
                     <option
                       v-for="(client, key) in clients"
                       :selected= "cart.client_id == client.id"
@@ -352,7 +350,7 @@ export default {
       status: 0,
       actionSelect: '',
       name: '',
-      client_id: [],
+      client_id: '',
       profile_id: [],
       tab: {
         profile: null
