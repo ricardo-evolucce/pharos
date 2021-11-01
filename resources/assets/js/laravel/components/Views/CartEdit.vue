@@ -364,7 +364,7 @@ export default {
     this.fotosEscolhidas();
   },
   methods: {
-    ...mapActions(['getUserPhotos','getUserPhotosCarts','toggleItemNewCart']),
+    ...mapActions(['getUserPhotos','getUserPhotosCarts','addItemEditCart']),
     fotoParaObjetoFoto(foto){
       return {
         id: `${foto}`,
@@ -413,11 +413,12 @@ export default {
        this.arrayFotosTab = []
        this.selectedImages = []
        this.arrayFotos = {}
+     
+     for(const pro in this.profiles_select){
+          // console.log("DEV_DEBUG","valor profile" + JSON.stringify(this.profiles_select[pro]));
+         this.addItemEditCart(this.profiles_select[pro])
 
-       for(const pro in this.profiles_select){
-          this.toggleItemNewCart(this.profiles_select[pro])
-
-          for (const key in this.new_cart) {
+        for (const key in this.new_cart) {
             const profile = this.new_cart[key];
             this.ids.push(profile.user_id)
             this.getUserPhotos(this.ids).then(perfis_fotos => {
@@ -440,7 +441,8 @@ export default {
                this.loading = false
             })
           }
-       }
+          //console.log("DEV_DEBUG","this.new_cart" + JSON.stringify(this.new_cart));
+        }
     },
 
     montarArrayFotosSelecionadas(fotos){

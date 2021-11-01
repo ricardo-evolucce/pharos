@@ -4,6 +4,7 @@ let store = {
     cartCount: 0,
     filters: {},
     profiles: [],
+    auxEditProfiles: [],
     profileList: [],
     newCart: [],
   },
@@ -20,11 +21,25 @@ let store = {
       state.filters = filters;
     },
     setAddInNewCart (state, profile) {
+      //console.log("DEV_DEBUG-----------","adicionar setAddInNewCart>>>>>>" + profile.id);
       state.newCart.push(profile);
+    },
+    setAddInNewCartId (state, profile) {
+      console.log("DEV_DEBUG-----------","adicionar setAddInNewCartId>>>>>> id" +  + profile);
+      state.auxEditProfiles.push(profile);
+      console.log("DEV_DEBUG","profiles ADICIONADOS" + JSON.stringify(state.auxEditProfiles));
+    },
+    setRemoveOfNewCartId (state, profile) {
+      let index = state.auxEditProfiles.indexOf(profile)
+      console.log("DEV_DEBUG-----------","remover>>>>>> id" + JSON.stringify(profile));
+      state.auxEditProfiles.splice(index, 1);
+      console.log("DEV_DEBUG","depois da remocao tenho>>>>> id" + JSON.stringify(state.auxEditProfiles));
     },
     setRemoveOfNewCart (state, profile) {
       let index = state.newCart.indexOf(profile)
+      console.log("DEV_DEBUG-----------","remover" + JSON.stringify(profile.id));
       state.newCart.splice(index, 1);
+      console.log("DEV_DEBUG","depois da remocao tenho>>>>>" + JSON.stringify(state.auxEditProfiles));
     },
   },
   getters: {
@@ -63,13 +78,22 @@ let store = {
     toggleItemNewCart ({ state, commit }, profile) {
       if (state.newCart.includes(profile)) {
         commit('setRemoveOfNewCart', profile)
-      }
-      else {
+      }else{
         commit('setAddInNewCart', profile)
       }
-
-      // console.log(state.newCart);
-
+    },
+    toggleEditItemNewCart({ state, commit }, profile){
+      if (state.auxEditProfiles.includes(profile.id)) {
+        commit('setRemoveOfNewCartId', profile.id)
+        commit('setRemoveOfNewCart', profile)
+      }else{
+        commit('setAddInNewCartId', profile.id)
+        commit('setAddInNewCart', profile)
+      }
+    },
+    addItemEditCart({ state, commit }, profile){
+      commit('setAddInNewCartId', profile.id)
+      commit('setAddInNewCart', profile)
     }
   }
 };
