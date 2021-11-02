@@ -341,7 +341,7 @@ export default {
       loading: false,
       arrayFotos: {},
       arrayFotosTab: [],
-      ids: [],
+      idsProfiles: [],
       arrayFotosSelecionadasTabs: {},
       arrayFotosSelecionadasSendTabs: {},
       selectedImages: [],
@@ -379,69 +379,48 @@ export default {
 
       let ids = []
       this.profile_id = []
+      let objeto_fotos_select = []
 
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
         this.profile_id.push(profile.id)
       }
+      this.getUserPhotos(ids)
+      .then(perfis_fotos => {
+        this.arrayFotos = perfis_fotos
+
+        for (const y in perfis_fotos) {
+          if(!JSON.stringify(this.idsProfiles).includes(y)){
+            const fotos2 = perfis_fotos[y];
+            for (const a in fotos2) {
+              const foto2 = fotos2[a];
+              this.selectedImages.push(this.fotoParaObjetoFoto(foto2))
+            }
+          }
+        }
+      })
+     
       this.getUserPhotosCarts(JSON.stringify(this.cart.id))
           .then(cart_select_photos => {
-            let objeto_fotos_select = []
             for (const i in cart_select_photos) {
               const fotos = cart_select_photos[i];
               for (const j in fotos) {
                 const foto = fotos[j];
-                objeto_fotos_select.push(this.fotoParaObjetoFoto(foto))
+                this.selectedImages.push(this.fotoParaObjetoFoto(foto))
               }
             }
-            this.selectedImages = objeto_fotos_select
-            this.montarArrayFotosSelecionadas(objeto_fotos_select)
-
-          })
-
-      this.getUserPhotos(ids)
-          .then(perfis_fotos => {
-            this.arrayFotos = perfis_fotos
             this.clickTab(this.new_cart[0])
-          })
-          .finally(() => {
-            this.loading = false
-          })
+            this.montarArrayFotosSelecionadas(this.selectedImages)
+         
+      }).finally(() => {
+         this.loading = false
+      })
     },
     fotosEscolhidas () {
-       this.arrayFotosTab = []
-       this.selectedImages = []
-       this.arrayFotos = {}
-     
      for(const pro in this.profiles_select){
-          // console.log("DEV_DEBUG","valor profile" + JSON.stringify(this.profiles_select[pro]));
-         this.addItemEditCart(this.profiles_select[pro])
-
-        for (const key in this.new_cart) {
-            const profile = this.new_cart[key];
-            this.ids.push(profile.user_id)
-            this.getUserPhotos(this.ids).then(perfis_fotos => {
-                  this.arrayFotos = perfis_fotos
-                  let objeto_fotos = []
-                  for (const i in perfis_fotos) {
-                    const fotos = perfis_fotos[i];
-                    for (const j in fotos) {
-                      const foto = fotos[j];
-                      objeto_fotos.push(this.fotoParaObjetoFoto(foto))
-                    }
-                  }
-
-                  this.selectedImages = objeto_fotos
-                  this.montarArrayFotosSelecionadas(objeto_fotos)
-
-                  this.clickTab(this.new_cart[0])
-                })
-              .finally(() => {
-               this.loading = false
-            })
-          }
-          //console.log("DEV_DEBUG","this.new_cart" + JSON.stringify(this.new_cart));
+          this.addItemEditCart(this.profiles_select[pro])
+          this.idsProfiles.push(this.profiles_select[pro].user_id)
         }
     },
 
