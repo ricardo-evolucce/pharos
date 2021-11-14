@@ -59,7 +59,7 @@ class ProfilesController extends Controller
     }
     public function userPhotos(Request $request)
     {
-        $ids = request('ids');
+        $ids = $request->get('ids');
         $array = [];
         if($ids){
             foreach ($ids as $key => $user_id) {
@@ -80,11 +80,11 @@ class ProfilesController extends Controller
     }
     public function userPhotosCarts(Request $request)
     {
-        $idCart = request('id');
-        $cart = Cart::where('id', $idCart)->with('profiles')->get()->toArray();
+        $idCart = $request->get('id');
+        $cart = Cart::where('id', $idCart)->with('profiles')->first();
         $array = [];
             if($idCart && $cart){
-            foreach (unserialize($cart[0]["photos_select"]) as $photos){
+            foreach (unserialize($cart["photos_select"]) as $photos){
                 foreach ($photos as $photo){
                    $arrayUser = explode('\\', $photo["src"]);
                    if(!isset($arrayUser[3]) && empty(isset($arrayUser[3]))){
@@ -94,6 +94,7 @@ class ProfilesController extends Controller
                 }
             }
         }
+
         return $array;
     }
 }

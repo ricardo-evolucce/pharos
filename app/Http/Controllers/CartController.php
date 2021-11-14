@@ -271,6 +271,69 @@ class CartController extends Controller
             ]);
         }
     }
+
+    public function updateItemPhoto(Request $request, Cart $cart)
+    {
+        $arrayAux = [];
+        $count = 0;
+        $aux2 = [];
+        $arrayAux = unserialize($cart->photos_select);
+       // echo "fotos para salvar";
+        dump($request->get('fotos'));
+        foreach($request->get('fotos') as $photo){
+
+            foreach($photo as $ph){
+                $dataUser = explode("\\", $ph["src"]);
+                if(count($dataUser) == 1){
+                    $dataUser = explode("/", $ph["src"]);
+                }
+                // adiciona itens ao array
+
+                foreach($arrayAux as $key => $value){
+                    if($key == intVal($dataUser[3])){
+                        $aux2[$key] = $value;
+
+                        if (!in_array($ph, $value)) {
+                         //   dump("adicionando", $ph["src"]);
+                            array_push($aux2[$key], $ph);
+                            $count ++;
+                        }
+                    }
+                }
+            }
+        }
+
+         if($count > 0){
+             $cart->update(["photos_select" => serialize($aux2)]);
+
+         }else{
+            foreach($arrayAux as $key2 => $photoBd){
+
+                foreach($photoBd as $key3 =>  $bd){
+                    foreach($request->get('fotos') as $photoRemove){
+                        foreach($photoRemove as $p){
+                            $user = explode("\\", $p["src"]);
+                            if(count($user) == 1){
+                                $user = explode("/", $p["src"]);
+                            }
+                            if($key2 == intVal($user[3])){
+                                if (!in_array($bd, $photoRemove)) {
+                                    dump("removido", $ph["src"]);
+
+                                    unset($arrayAux[$key2][$key3]);
+                                } 
+                            }
+                        }
+                    }
+                }                    
+             }
+           //  echo "removeu";
+           //  dump($arrayAux);
+
+            $cart->update(["photos_select" => serialize($arrayAux)]);
+        }
+    }
+
     public function deletedirectoryCartProfile($cart){
         Storage::disk('public')->deleteDirectory("/carts/{$cart->id}");
     }

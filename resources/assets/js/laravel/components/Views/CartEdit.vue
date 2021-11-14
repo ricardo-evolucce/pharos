@@ -106,7 +106,7 @@
                             >
                              <!-- {{arrayFotos}} -->
                              <!--{{arrayFotosSelecionadasTabs}}-->
-                             <!-- {{selectedImages}} -->
+                             {{selectedImages}}
                              <!-- TABS -->
                               <nav>
                                 <div
@@ -400,8 +400,7 @@ export default {
           }
         }
       })
-     
-      this.getUserPhotosCarts(JSON.stringify(this.cart.id))
+      this.getUserPhotosCarts(this.cart.id)
           .then(cart_select_photos => {
             for (const i in cart_select_photos) {
               const fotos = cart_select_photos[i];
@@ -412,10 +411,32 @@ export default {
             }
             this.clickTab(this.new_cart[0])
             this.montarArrayFotosSelecionadas(this.selectedImages)
-         
       }).finally(() => {
          this.loading = false
       })
+    },
+    updateVarImgsSelect(){
+     this.selectedImages = []
+      this.loading = true
+
+      this.getUserPhotosCarts(this.cart.id)
+          .then(cart_select_photos => {
+
+            for (const i in cart_select_photos) {
+
+              const fotos = cart_select_photos[i];
+              for (const j in fotos) {
+
+                const foto = fotos[j];
+                this.selectedImages.push(this.fotoParaObjetoFoto(foto))
+
+              }
+            }         
+      })
+      console.log("DEV_DEBUG" ,"3.3" + JSON.stringify(this.selectedImages));
+
+      this.loading = false
+
     },
     fotosEscolhidas () {
      for(const pro in this.profiles_select){
@@ -423,41 +444,39 @@ export default {
           this.idsProfiles.push(this.profiles_select[pro].user_id)
         }
     },
-
     montarArrayFotosSelecionadas(fotos){
+
       let aux = {}
       this.arrayFotosSelecionadasSendTabs = {}
-      // verificar se a img de fotos estão contidas no selectedImage
-      // o que não tiver removo do selectImage
-      for (const y in this.selectedImages) {
-        if (!fotos.includes(this.selectedImages[y])) {
-          this.selectedImages.splice(y, 1);
-        }
+      console.log("DEV_DEBUG" ,"2" + JSON.stringify(fotos));
+      console.log("DEV_DEBUG" ,"2.5" + JSON.stringify(this.selectedImages));
+
+      for (const y in fotos) {
+          let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[y].src).replace(/"/g, ""))
+          
+          if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
+            this.arrayFotosSelecionadasSendTabs[user_id_2] = []
+          }
+          this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[y])
       }
 
-      // pego os usuarios das fotos selecionadas
-      for (const y in this.selectedImages) {
+      // for (const y in this.selectedImages) {
+      //     let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(this.selectedImages[y].src).replace(/"/g, ""))
+          
+      //     if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
+      //       this.arrayFotosSelecionadasSendTabs[user_id_2] = []
+      //     }
+      //     this.arrayFotosSelecionadasSendTabs[user_id_2].push(this.selectedImages[y])
+      // }
 
-        let user_id = this.pegarUserIdPelaFoto(this.selectedImages[y].src)
-        if (!aux.hasOwnProperty(user_id)) {
-          aux[user_id] = []
-        }
-        aux[user_id].push(this.selectedImages[y])
-        // alimento o objeto com as fotos selecionadas
-        this.arrayFotosSelecionadasTabs = aux
-        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id)) {
-          this.arrayFotosSelecionadasSendTabs[user_id] = []
-        }
-        this.arrayFotosSelecionadasSendTabs[user_id].push(this.selectedImages[y])
-      }
-      if(!this.selectedImages.includes(fotos[JSON.stringify(fotos.length) -1])) {
-        this.selectedImages.push(fotos[JSON.stringify(fotos.length) -1])
-        let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[JSON.stringify(fotos.length) -1].src).replace(/"/g, ""))
-        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
-          this.arrayFotosSelecionadasSendTabs[user_id_2] = []
-        }
-        this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[JSON.stringify(fotos.length) -1])
-      }
+
+      this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, JSON.stringify(this.cart.id))
+        .then(response=>{
+          // zera array e traz consulta do banco 
+           this.updateVarImgsSelect()
+      }).catch(error=>{
+          console.log("Error ao processar" + error)
+      });
     },
     onselectmultipleimage (fotos) {
       this.arrayFotosSelecionadasTabs = {}
@@ -529,6 +548,16 @@ export default {
           }
       });
       e.preventDefault();
+    },
+    addRemoveItemPhotoCart(fotos, cart_id){
+      return new Promise((resolve, reject) => {
+        axios.post(`/carts/updateItemPhoto/`+ cart_id,{
+          fotos: fotos
+        }).then(response => {
+            resolve(response.data)
+          })
+          .catch(error => reject(error));
+      })
     }
   },
 }

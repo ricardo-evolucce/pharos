@@ -85,6 +85,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/carts/delete', 'CartController@delete')->name('carts.delete');
     Route::post('/carts/{cart}/edit', 'CartController@edit')->name('carts.edit');
     Route::post('/carts/update/{cart}', 'CartController@update')->name('carts.update');
+    Route::post('/carts/updateItemPhoto/{cart}', 'CartController@updateItemPhoto')->name('carts.updateItemPhoto');
     Route::post('/carts/duplicate', 'CartController@duplicate')->name('carts.duplicate');
 
     // Profile
