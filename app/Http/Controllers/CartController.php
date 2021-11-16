@@ -30,7 +30,7 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Cart::query();
+        $query = Cart::query()->where("finish_cart", true);
 
         if(isset($request->client_id) && !empty($request->client_id)){
             $query->where('client_id', '=', $request->client_id);
@@ -44,6 +44,23 @@ class CartController extends Controller
 
         $clients = Client::all();
         return view('carts.index', compact('carts','clients'));
+    }
+    public function pendings(Request $request)
+    {
+        $query = Cart::query()->where("finish_cart", false);
+
+        if(isset($request->client_id) && !empty($request->client_id)){
+            $query->where('client_id', '=', $request->client_id);
+        }
+
+        if(isset($request->created_date) && !empty($request->created_date)){
+            $query->whereDate('created_at', '=', Carbon::createFromFormat('d/m/Y', $request->created_date)->format('Y-m-d'));
+        }
+
+        $carts = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        $clients = Client::all();
+        return view('carts.pending', compact('carts','clients'));
     }
 
     /**
@@ -102,6 +119,34 @@ class CartController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function storeCartDraft(Request $request)
+    {
+        $errors = 0;
+
+            $dataCreate = array(
+                "photos_select" => serialize($request->get('fotos')),
+                "name" => $request->name,
+                "finish_cart" => false,
+            );
+            
+            $cart = Cart::create($dataCreate);
+            if($request->get('profile_id')){
+                $cart->profiles()->sync($request->profile_id);
+            }
+            $this->savePDFPhotos($cart, $request->get('fotos'));
+
+        if($errors > 0){
+            return response()->json([
+               'status' => 1,
+               'message'   =>'Ocorreu um erro ao salvar a imagem'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 3,
+                'id' => $cart->id
+            ]);
+        }
+    }
     public function store(Request $request)
     {
         if ($request->action == 'create_send') {
@@ -215,6 +260,7 @@ class CartController extends Controller
      */
     public function update(Request $request, Cart $cart)
     {
+
         if ($request->action == 'edit_send') {
 
             $messages = [
@@ -252,6 +298,10 @@ class CartController extends Controller
         $this->deletedirectoryCartProfile($cart);
         // cria um novo diretório
         $this->savePDFPhotos($cart, $request->get('fotos'));
+      
+        if(count($request->get('client_ids')) > 0){
+            $this->createCartsClients($request);
+        }
 
         if ($request->action == 'edit_send') {
             if (!$this->send($cart)) {
@@ -271,68 +321,35 @@ class CartController extends Controller
             ]);
         }
     }
+    public function createCartsClients($request){
+        foreach ($request->client_ids as $client_id){
+            $dataCreate = array(
+                "client_id" => $client_id,
+                "name" => $request->name,
+                "photos_select" => serialize($request->get('fotos'))
+            );
 
-    public function updateItemPhoto(Request $request, Cart $cart)
-    {
-        $arrayAux = [];
-        $count = 0;
-        $aux2 = [];
-        $arrayAux = unserialize($cart->photos_select);
-       // echo "fotos para salvar";
-        dump($request->get('fotos'));
-        foreach($request->get('fotos') as $photo){
+            $cart = Cart::create($dataCreate);
+            $cart->profiles()->sync($request->profile_id);
+            $this->savePDFPhotos($cart, $request->get('fotos'));
 
-            foreach($photo as $ph){
-                $dataUser = explode("\\", $ph["src"]);
-                if(count($dataUser) == 1){
-                    $dataUser = explode("/", $ph["src"]);
-                }
-                // adiciona itens ao array
-
-                foreach($arrayAux as $key => $value){
-                    if($key == intVal($dataUser[3])){
-                        $aux2[$key] = $value;
-
-                        if (!in_array($ph, $value)) {
-                         //   dump("adicionando", $ph["src"]);
-                            array_push($aux2[$key], $ph);
-                            $count ++;
-                        }
-                    }
+            if ($request->action == 'edit_send') {
+                if (!$this->send($cart)) {
+                    return response()->json([
+                        'status' => 1,
+                        'message'   =>'Ocorreu um erro ao enviar o pedido para a produtora!'
+                    ]);
                 }
             }
-        }
-
-         if($count > 0){
-             $cart->update(["photos_select" => serialize($aux2)]);
-
-         }else{
-            foreach($arrayAux as $key2 => $photoBd){
-
-                foreach($photoBd as $key3 =>  $bd){
-                    foreach($request->get('fotos') as $photoRemove){
-                        foreach($photoRemove as $p){
-                            $user = explode("\\", $p["src"]);
-                            if(count($user) == 1){
-                                $user = explode("/", $p["src"]);
-                            }
-                            if($key2 == intVal($user[3])){
-                                if (!in_array($bd, $photoRemove)) {
-                                    dump("removido", $ph["src"]);
-
-                                    unset($arrayAux[$key2][$key3]);
-                                } 
-                            }
-                        }
-                    }
-                }                    
-             }
-           //  echo "removeu";
-           //  dump($arrayAux);
-
-            $cart->update(["photos_select" => serialize($arrayAux)]);
+            
         }
     }
+    
+    public function updateItemPhoto(Request $request, Cart $cart)
+    {
+        $cart->update(["photos_select" => serialize($request->get('fotos'))]);
+    }
+
 
     public function deletedirectoryCartProfile($cart){
         Storage::disk('public')->deleteDirectory("/carts/{$cart->id}");

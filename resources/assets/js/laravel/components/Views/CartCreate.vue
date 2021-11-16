@@ -132,7 +132,7 @@
                       >
                         <!-- {{arrayFotos}} -->
                         <!--{{arrayFotosSelecionadasTabs}}-->
-                        <!--{{selectedImages}}-->
+                        <!--{{selectedImages}} -->
                         <!-- TABS -->
                         <nav>
                           <div
@@ -216,7 +216,7 @@
                   data-target="#modal"
                   value="escolherfotos_continuar"
                   :disabled="!new_cart.length"
-                  @click="escolherFotosContinuar()"
+                  @click="escolherFotosContinuar(true)"
                 >
                   <i class="fa fa-arrow-right mr-1"></i> Escolher fotos e continuar
                 </button>
@@ -387,20 +387,35 @@ export default {
 
   },
   methods: {
-    ...mapActions(['getUserPhotos']),
+    ...mapActions(['getUserPhotos','getUserPhotosCarts',]),
     fotoParaObjetoFoto(foto){
       return {
         id: `${foto}`,
         src: `${foto}`,
       }
     },
-    escolherFotosContinuar () {
+    escolherFotosContinuar (isStart) {
       this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
 
       let ids = []
       this.profile_id = []
+
+      if(this.cart_id){
+        this.selectedImages = []
+        this.getUserPhotosCarts(this.cart_id)
+          .then(cart_select_photos => {
+              for (const i in cart_select_photos) {
+                  const fotos = cart_select_photos[i];
+                  for (const j in fotos) {
+                    const foto = fotos[j];
+                    this.selectedImages.push(this.fotoParaObjetoFoto(foto))
+                  }
+              }
+          })
+      }
+      
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
@@ -419,55 +434,57 @@ export default {
                 objeto_fotos.push(this.fotoParaObjetoFoto(foto))
               }
             }
-            this.selectedImages = objeto_fotos
-            this.montarArrayFotosSelecionadas(objeto_fotos)
-            this.clickTab(this.new_cart[0])
-          })
-          .finally(() => {
-            this.loading = false
-          })
+
+          if(this.cart_id){
+              this.montarArrayFotosSelecionadas(this.selectedImages)
+            }else{
+              this.selectedImages = objeto_fotos
+              this.montarArrayFotosSelecionadas(objeto_fotos)
+          }
+        if(isStart){
+          this.clickTab(this.new_cart[0])
+        } else{
+          this.clickTab(this.tab.profile)
+        }
+      }).finally(() => {
+        this.loading = false
+      })
     },
 
     montarArrayFotosSelecionadas(fotos){
-      let aux = {}
       this.arrayFotosSelecionadasSendTabs = {}
 
-      // verificar se as fotos estão contidas no selectedImage
-      // o que não tiver removo do selectImage
-      for (const y in this.selectedImages) {
-        if (!fotos.includes(this.selectedImages[y])) {
-          this.selectedImages.splice(y, 1);
-        }
-      }
-
-      // pego os usuarios das fotos selecionadas
-      for (const y in this.selectedImages) {
-
-        let user_id = this.pegarUserIdPelaFoto(this.selectedImages[y].src)
-        console.log("DEV_DEBUG_USER", user_id);
-        if (!aux.hasOwnProperty(user_id)) {
-          aux[user_id] = []
-        }
-        aux[user_id].push(this.selectedImages[y])
-        // alimento o objeto com as fotos selecionadas
-        this.arrayFotosSelecionadasTabs = aux
-        if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id)) {
-          this.arrayFotosSelecionadasSendTabs[user_id] = []
-        }
-        this.arrayFotosSelecionadasSendTabs[user_id].push(this.selectedImages[y])
-      }
-      if(!this.selectedImages.includes(fotos[JSON.stringify(fotos.length) -1])) {
-            this.selectedImages.push(fotos[JSON.stringify(fotos.length) -1])
-            let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[JSON.stringify(fotos.length) -1].src).replace(/"/g, ""))
-            if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
-              this.arrayFotosSelecionadasSendTabs[user_id_2] = []
-            }
-            this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[JSON.stringify(fotos.length) -1])
+      for (const y in fotos) {
+          let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[y].src).replace(/"/g, ""))
+          
+          if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
+            this.arrayFotosSelecionadasSendTabs[user_id_2] = []
           }
-      },
+          // alimento o objeto com as fotos selecionadas
+          this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[y])
+          this.arrayFotosSelecionadasTabs = this.arrayFotosSelecionadasSendTabs
+      }
+    },
     onselectmultipleimage (fotos) {
       this.arrayFotosSelecionadasTabs = {}
       this.montarArrayFotosSelecionadas(fotos)
+
+      if(this.cart_id){
+        this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, this.cart_id)
+          .then(response=>{
+            this.escolherFotosContinuar(false)
+        }).catch(error=>{
+            console.log("Error ao processar" + error)
+        });
+      }else{
+        this.saveCart(this.arrayFotosSelecionadasSendTabs)
+          .then(response=>{
+  
+        }).catch(error=>{
+            console.log("Error ao salvar" + error)
+        });
+      } 
+
     },
     clickTab (profile) {
       this.tab.profile = profile
@@ -513,6 +530,7 @@ export default {
           name: this.name,
           profile_id: this.profile_id,
           client_ids: this.client_ids,
+          cart_id: Object,
           fotos: this.arrayFotosSelecionadasSendTabs,
           action: this.actionSelect
       }).then(response =>{
@@ -534,6 +552,29 @@ export default {
         }
       });
       e.preventDefault();
+    },
+    addRemoveItemPhotoCart(fotos, cart_id){
+      return new Promise((resolve, reject) => {
+        axios.post(`/carts/updateItemPhoto/`+ cart_id,{
+          fotos: fotos
+        }).then(response => {
+            resolve(response.data)
+          })
+          .catch(error => reject(error));
+      })
+    },
+    saveCart(fotos){
+      return new Promise((resolve, reject) => {
+        axios.post(`/carts/storeCartDraft/`,{
+          name: this.name,
+          profile_id: this.profile_id,
+          fotos: fotos
+        }).then(response => {
+            this.cart_id = response.data.id
+            resolve(response.data)
+          })
+          .catch(error => reject(error));
+      })
     }
   },
 }

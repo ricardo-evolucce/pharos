@@ -79,6 +79,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::view('/dashboard', 'dashboard');
 
     // Cart
+    Route::get('/carts/pendings', 'CartController@pendings')->name('carts.pendings');
     Route::resource('/carts', 'CartController');
     Route::get('/carts/{cart}/preview/{profile}', 'CartController@previewPDF')->name('profile.preview');
     Route::get('/carts/{cart}/send', 'CartController@sendCart')->name('carts.send');
@@ -87,6 +88,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/carts/update/{cart}', 'CartController@update')->name('carts.update');
     Route::post('/carts/updateItemPhoto/{cart}', 'CartController@updateItemPhoto')->name('carts.updateItemPhoto');
     Route::post('/carts/duplicate', 'CartController@duplicate')->name('carts.duplicate');
+    Route::post('/carts/storeCartDraft', 'CartController@storeCartDraft')->name('carts.storeCartDraft');
 
     // Profile
     Route::resource('/profiles', 'ProfileController');

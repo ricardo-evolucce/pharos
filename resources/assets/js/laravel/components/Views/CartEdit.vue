@@ -192,7 +192,7 @@
                           data-target="#modal"
                           value="escolherfotos_continuar"
                           :disabled="!new_cart.length"
-                          @click="escolherFotosContinuar()"
+                          @click="escolherFotosContinuar(true)"
                       >
                         <i class="fa fa-arrow-right mr-1"></i> Escolher fotos e continuar
                       </button>
@@ -376,13 +376,12 @@ export default {
         src: `${foto}`,
       }
     },
-    escolherFotosContinuar () {
+    escolherFotosContinuar (isStart) {
       this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
       this.arrayFotos = {}
-      console.log(this.new_cart[0])
-
+     
       let ids = []
       this.profile_id = []
       let objeto_fotos_select = []
@@ -408,8 +407,12 @@ export default {
               }
             }
       
-      this.montarArrayFotosSelecionadas(this.selectedImages)
-
+        this.montarArrayFotosSelecionadas(this.selectedImages)
+        if(isStart){
+          this.clickTab(this.new_cart[0])
+        } else{
+          this.clickTab(this.tab.profile)
+        }
       }).finally(() => {
          this.loading = false
       })
@@ -440,11 +443,10 @@ export default {
 
      this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, JSON.stringify(this.cart.id))
         .then(response=>{
-          this.escolherFotosContinuar()
+          this.escolherFotosContinuar(false)
       })
     },
     clickTab (profile) {
-
       this.tab.profile = profile
       this.exibirFotosTab()
     },

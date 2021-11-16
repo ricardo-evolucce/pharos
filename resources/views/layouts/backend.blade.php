@@ -133,6 +133,11 @@
                                             <span class="nav-main-link-name">Novo carrinho</span>
                                         </a>
                                     </li>
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link{{ request()->is('carts/pendings') ? ' active' : '' }}" href="{{url('carts/pendings')}}">
+                                            <span class="nav-main-link-name">Carrinhos pendentes</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-main-item{{ request()->is('profiles*') ? ' open' : '' }}">
