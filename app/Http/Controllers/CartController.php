@@ -344,12 +344,12 @@ class CartController extends Controller
             
         }
     }
-    
+
     public function updateItemPhoto(Request $request, Cart $cart)
     {
         $cart->update(["photos_select" => serialize($request->get('fotos'))]);
+        $cart->profiles()->sync($request->profile_id);
     }
-
 
     public function deletedirectoryCartProfile($cart){
         Storage::disk('public')->deleteDirectory("/carts/{$cart->id}");

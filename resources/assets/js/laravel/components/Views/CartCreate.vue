@@ -556,7 +556,8 @@ export default {
     addRemoveItemPhotoCart(fotos, cart_id){
       return new Promise((resolve, reject) => {
         axios.post(`/carts/updateItemPhoto/`+ cart_id,{
-          fotos: fotos
+          fotos: fotos,
+          profile_id: this.profile_id
         }).then(response => {
             resolve(response.data)
           })
