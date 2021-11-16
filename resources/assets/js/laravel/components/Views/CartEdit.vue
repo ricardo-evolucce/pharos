@@ -23,7 +23,10 @@
                       v-model="cart.name"
                     >
                   </div>
-                  <select class="custom-select" v-model="cart.client_id">
+                  <label for="name">
+                      Produtora selecionada<span class="text-danger">*</span>
+                  </label><br>
+                   <select class="custom-select" v-model="cart.client_id">
                     <option
                       v-for="(client, key) in clients"
                       :selected= "cart.client_id == client.id"
@@ -31,22 +34,23 @@
                       :key="key"
                     >{{client.contact}}</option>
                   </select>
+                  <br>
+                  <label for="name">
+                      Enviar para outras produtoras<span class="text-danger">*</span>
+                  </label><br>
+                  <div v-for="(client, key, index) in clients" :key="index">
+                    <input type="checkbox"
+                       :id="key"
+                       :selected= "cart.client_id == client.id"
+                       :name="'client_ids[]'"
+                       :value="client.id"
+                       v-model="client_ids">
+                       <label
+                           :for="key">
+                           {{ client.contact }}
+                       </label>
+                  </div>
                 <br>
-                <!-- People -->
-<!--                <h2 class="content-heading pt-0">Agenciados</h2>-->
-<!--                <div class="row">-->
-<!--                <div class="col-12" v-for="(profile, key, index) in profiles" :key="index" >-->
-<!--                  <input-->
-<!--                    type="checkbox"-->
-<!--                    id="key"-->
-<!--                    :name="'profile_ids[]'"-->
-<!--                    :value="profile.id"-->
-<!--                    :checked="profiles_select.includes(profile.id)"-->
-<!--                  />-->
-<!--                  <label :for="key">{{profile.fancy_name}}</label>-->
-<!--                </div>-->
-<!--                </div>-->
-                <!-- END People -->
                 <!-- People -->
                 <h2 class="content-heading pt-0">Agenciados</h2>
                 <div class="row push">
@@ -106,7 +110,7 @@
                             >
                              <!-- {{arrayFotos}} -->
                              <!--{{arrayFotosSelecionadasTabs}}-->
-                             {{selectedImages}}
+                             <!-- {{selectedImages}} -->
                              <!-- TABS -->
                               <nav>
                                 <div
@@ -351,6 +355,7 @@ export default {
       actionSelect: '',
       name: '',
       client_id: '',
+      client_ids: [],
       profile_id: [],
       tab: {
         profile: null
@@ -376,11 +381,13 @@ export default {
       this.arrayFotosTab = []
       this.selectedImages = []
       this.arrayFotos = {}
+      console.log(this.new_cart[0])
 
       let ids = []
       this.profile_id = []
       let objeto_fotos_select = []
-
+      
+      // traz as fotos cadastradas dos agenciados
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
@@ -389,17 +396,8 @@ export default {
       this.getUserPhotos(ids)
       .then(perfis_fotos => {
         this.arrayFotos = perfis_fotos
-
-        for (const y in perfis_fotos) {
-          if(!JSON.stringify(this.idsProfiles).includes(y)){
-            const fotos2 = perfis_fotos[y];
-            for (const a in fotos2) {
-              const foto2 = fotos2[a];
-              this.selectedImages.push(this.fotoParaObjetoFoto(foto2))
-            }
-          }
-        }
       })
+      // traz as fotos selecionadas do carrinho
       this.getUserPhotosCarts(this.cart.id)
           .then(cart_select_photos => {
             for (const i in cart_select_photos) {
@@ -409,35 +407,14 @@ export default {
                 this.selectedImages.push(this.fotoParaObjetoFoto(foto))
               }
             }
-            this.clickTab(this.new_cart[0])
-            this.montarArrayFotosSelecionadas(this.selectedImages)
+      
+      this.montarArrayFotosSelecionadas(this.selectedImages)
+
       }).finally(() => {
          this.loading = false
       })
     },
-    updateVarImgsSelect(){
-     this.selectedImages = []
-      this.loading = true
 
-      this.getUserPhotosCarts(this.cart.id)
-          .then(cart_select_photos => {
-
-            for (const i in cart_select_photos) {
-
-              const fotos = cart_select_photos[i];
-              for (const j in fotos) {
-
-                const foto = fotos[j];
-                this.selectedImages.push(this.fotoParaObjetoFoto(foto))
-
-              }
-            }         
-      })
-      console.log("DEV_DEBUG" ,"3.3" + JSON.stringify(this.selectedImages));
-
-      this.loading = false
-
-    },
     fotosEscolhidas () {
      for(const pro in this.profiles_select){
           this.addItemEditCart(this.profiles_select[pro])
@@ -446,11 +423,7 @@ export default {
     },
     montarArrayFotosSelecionadas(fotos){
 
-      let aux = {}
       this.arrayFotosSelecionadasSendTabs = {}
-      console.log("DEV_DEBUG" ,"2" + JSON.stringify(fotos));
-      console.log("DEV_DEBUG" ,"2.5" + JSON.stringify(this.selectedImages));
-
       for (const y in fotos) {
           let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(fotos[y].src).replace(/"/g, ""))
           
@@ -458,38 +431,26 @@ export default {
             this.arrayFotosSelecionadasSendTabs[user_id_2] = []
           }
           this.arrayFotosSelecionadasSendTabs[user_id_2].push(fotos[y])
+          this.arrayFotosSelecionadasTabs = this.arrayFotosSelecionadasSendTabs
       }
-
-      // for (const y in this.selectedImages) {
-      //     let user_id_2 = this.pegarUserIdPelaFoto(JSON.stringify(this.selectedImages[y].src).replace(/"/g, ""))
-          
-      //     if (!this.arrayFotosSelecionadasSendTabs.hasOwnProperty(user_id_2)) {
-      //       this.arrayFotosSelecionadasSendTabs[user_id_2] = []
-      //     }
-      //     this.arrayFotosSelecionadasSendTabs[user_id_2].push(this.selectedImages[y])
-      // }
-
-
-      this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, JSON.stringify(this.cart.id))
-        .then(response=>{
-          // zera array e traz consulta do banco 
-           this.updateVarImgsSelect()
-      }).catch(error=>{
-          console.log("Error ao processar" + error)
-      });
     },
     onselectmultipleimage (fotos) {
       this.arrayFotosSelecionadasTabs = {}
       this.montarArrayFotosSelecionadas(fotos)
+
+     this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, JSON.stringify(this.cart.id))
+        .then(response=>{
+          this.escolherFotosContinuar()
+      })
     },
     clickTab (profile) {
+
       this.tab.profile = profile
       this.exibirFotosTab()
     },
     exibirFotosTab () {
       this.loading = true
       this.arrayFotosTab = []
-
       let user_id = this.tab.profile.user_id
       let fotos_perfil = this.arrayFotos[user_id]
 
@@ -498,6 +459,7 @@ export default {
         let objeto = this.fotoParaObjetoFoto(foto)
         this.arrayFotosTab.push(objeto)
       }
+      
       this.loading = false
     },
     pegarUserIdPelaFoto(foto){
@@ -526,6 +488,7 @@ export default {
           name: this.cart.name,
           profile_id: this.profile_id,
           client_id: this.cart.client_id,
+          client_ids: this.client_ids,
           fotos: this.arrayFotosSelecionadasSendTabs,
           action: this.actionSelect
 
