@@ -119,7 +119,7 @@ class CartController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeCartDraft(Request $request)
+    public function storeCartDraftOlds(Request $request)
     {
         // $errors = 0;
         dd($request->all());
