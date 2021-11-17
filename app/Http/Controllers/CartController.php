@@ -122,7 +122,7 @@ class CartController extends Controller
     public function storeCartDraft(Request $request)
     {
         $errors = 0;
-        dump($request->all());
+        dd($request->all());
             $dataCreate = array(
                 "photos_select" => serialize($request->get('fotos')),
                 "name" => $request->get('name'),
