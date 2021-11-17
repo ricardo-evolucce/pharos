@@ -80,7 +80,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     // Cart
     Route::get('/carts/pendings', 'CartController@pendings')->name('carts.pendings');
-    Route::post('/carts/storeCartDraft', 'CartController@storeCartDraft')->name('carts.storeCartDraft');
     Route::resource('/carts', 'CartController');
     Route::get('/carts/{cart}/preview/{profile}', 'CartController@previewPDF')->name('profile.preview');
     Route::get('/carts/{cart}/send', 'CartController@sendCart')->name('carts.send');
@@ -88,6 +87,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/carts/{cart}/edit', 'CartController@edit')->name('carts.edit');
     Route::post('/carts/update/{cart}', 'CartController@update')->name('carts.update');
     Route::post('/carts/updateItemPhoto/{cart}', 'CartController@updateItemPhoto')->name('carts.updateItemPhoto');
+    Route::post('/carts/storeCartDraft', 'CartController@storeCartDraft')->name('carts.storeCartDraft');
     Route::post('/carts/duplicate', 'CartController@duplicate')->name('carts.duplicate');
 
     // Profile
