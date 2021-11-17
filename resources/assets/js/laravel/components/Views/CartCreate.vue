@@ -15,7 +15,7 @@
           <!-- {{clients}} -->
           <!-- @csrf -->
           <!-- Vital Info -->
-          <h2 class="content-heading pt-0">Informações</h2>
+          <h2 class="content-heading pt-0">Informação</h2>
           <div class="row push">
             <div class="col-lg-4">
               <p class="text-muted">
@@ -566,7 +566,7 @@ export default {
     },
     saveCart(fotos){
       return new Promise((resolve, reject) => {
-        axios.post(`/carts/storeCartDraft/`,{
+        axios.post(`/carts/storeCartDraft`,{
           name: this.name,
           profile_id: this.profile_id,
           fotos: fotos
