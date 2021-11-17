@@ -571,9 +571,11 @@ export default {
           profile_id: this.profile_id,
           fotos: fotos
         }).then(response => {
+            alert("funcionou>>>>>" + JSON.stringify(response))
             this.cart_id = response.data.id
             resolve(response.data)
           })
+            alert("error>>>>>" + JSON.stringify(error))
           .catch(error => reject(error));
       })
     }

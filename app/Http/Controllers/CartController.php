@@ -119,35 +119,34 @@ class CartController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeCartDraftOlds(Request $request)
+    public function storeCartDraft(Request $request)
     {
-        // $errors = 0;
-        dd($request->all());
-        //     $dataCreate = array(
-        //         "photos_select" => serialize($request->get('fotos')),
-        //         "name" => $request->get('name'),
-        //         "finish_cart" => false,
-        //     );
+        $errors = 0;
+            $dataCreate = array(
+                "photos_select" => serialize($request->get('fotos')),
+                "name" => $request->get('name'),
+                "finish_cart" => false,
+            );
             
-        //     dump($dataCreate);
-        //     $cart = Cart::create($dataCreate);
-        //     dd($cart);
-        //     if($request->get('profile_id')){
-        //         $cart->profiles()->sync($request->profile_id);
-        //     }
-        //     $this->savePDFPhotos($cart, $request->get('fotos'));
+            $cart = Cart::create($dataCreate);
+           
+            if($request->get('profile_id')){
+                $cart->profiles()->sync($request->profile_id);
+            }
 
-        // if($errors > 0){
-        //     return response()->json([
-        //        'status' => 1,
-        //        'message'   =>'Ocorreu um erro ao salvar a imagem'
-        //     ]);
-        // }else{
-        //     return response()->json([
-        //         'status' => 3,
-        //         'id' => $cart->id
-        //     ]);
-        // }
+            $this->savePDFPhotos($cart, $request->get('fotos'));
+
+        if($errors > 0){
+            return response()->json([
+               'status' => 1,
+               'message'   =>'Ocorreu um erro ao salvar a imagem'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 3,
+                'id' => $cart->id
+            ]);
+        }
     }
     public function store(Request $request)
     {
