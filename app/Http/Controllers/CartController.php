@@ -122,14 +122,16 @@ class CartController extends Controller
     public function storeCartDraft(Request $request)
     {
         $errors = 0;
-
+        dump($request->all());
             $dataCreate = array(
                 "photos_select" => serialize($request->get('fotos')),
                 "name" => $request->get('name'),
                 "finish_cart" => false,
             );
             
+            dump($dataCreate);
             $cart = Cart::create($dataCreate);
+            dd($cart);
             if($request->get('profile_id')){
                 $cart->profiles()->sync($request->profile_id);
             }
