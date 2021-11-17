@@ -121,33 +121,33 @@ class CartController extends Controller
      */
     public function storeCartDraft(Request $request)
     {
-        $errors = 0;
+        // $errors = 0;
         dd($request->all());
-            $dataCreate = array(
-                "photos_select" => serialize($request->get('fotos')),
-                "name" => $request->get('name'),
-                "finish_cart" => false,
-            );
+        //     $dataCreate = array(
+        //         "photos_select" => serialize($request->get('fotos')),
+        //         "name" => $request->get('name'),
+        //         "finish_cart" => false,
+        //     );
             
-            dump($dataCreate);
-            $cart = Cart::create($dataCreate);
-            dd($cart);
-            if($request->get('profile_id')){
-                $cart->profiles()->sync($request->profile_id);
-            }
-            $this->savePDFPhotos($cart, $request->get('fotos'));
+        //     dump($dataCreate);
+        //     $cart = Cart::create($dataCreate);
+        //     dd($cart);
+        //     if($request->get('profile_id')){
+        //         $cart->profiles()->sync($request->profile_id);
+        //     }
+        //     $this->savePDFPhotos($cart, $request->get('fotos'));
 
-        if($errors > 0){
-            return response()->json([
-               'status' => 1,
-               'message'   =>'Ocorreu um erro ao salvar a imagem'
-            ]);
-        }else{
-            return response()->json([
-                'status' => 3,
-                'id' => $cart->id
-            ]);
-        }
+        // if($errors > 0){
+        //     return response()->json([
+        //        'status' => 1,
+        //        'message'   =>'Ocorreu um erro ao salvar a imagem'
+        //     ]);
+        // }else{
+        //     return response()->json([
+        //         'status' => 3,
+        //         'id' => $cart->id
+        //     ]);
+        // }
     }
     public function store(Request $request)
     {
