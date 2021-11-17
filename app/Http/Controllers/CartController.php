@@ -125,7 +125,7 @@ class CartController extends Controller
 
             $dataCreate = array(
                 "photos_select" => serialize($request->get('fotos')),
-                "name" => $request->name,
+                "name" => $request->get('name'),
                 "finish_cart" => false,
             );
             
