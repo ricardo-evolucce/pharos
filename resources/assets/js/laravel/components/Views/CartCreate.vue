@@ -397,7 +397,7 @@ export default {
     escolherFotosContinuar (isStart) {
       this.loading = true
       this.arrayFotosTab = []
-    //  this.selectedImages = []
+      this.selectedImages = []
 
       let ids = []
       this.profile_id = []
@@ -434,6 +434,8 @@ export default {
               for (const j in fotos) {
                 const foto = fotos[j];
                 objeto_fotos.push(this.fotoParaObjetoFoto(foto))
+                console.log("objsetos fotos>>>>>" + JSON.stringify(this.selectedImages))
+
               }
             }
 

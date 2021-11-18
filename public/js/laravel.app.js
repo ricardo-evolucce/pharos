@@ -34026,7 +34026,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
       this.loading = true;
       this.arrayFotosTab = [];
-      //  this.selectedImages = []
+      this.selectedImages = [];
 
       var ids = [];
       this.profile_id = [];
@@ -34060,6 +34060,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
           for (var j in fotos) {
             var foto = fotos[j];
             objeto_fotos.push(_this.fotoParaObjetoFoto(foto));
+            console.log("objsetos fotos>>>>>" + JSON.stringify(_this.selectedImages));
           }
         }
 
