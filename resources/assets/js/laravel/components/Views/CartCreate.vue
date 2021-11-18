@@ -403,7 +403,7 @@ export default {
       this.profile_id = []
 
       if(this.cart_id){
-        this.selectedImages = []
+      //  this.selectedImages = []
         this.getUserPhotosCarts(this.cart_id)
           .then(cart_select_photos => {
               for (const i in cart_select_photos) {
