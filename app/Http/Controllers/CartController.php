@@ -510,6 +510,7 @@ class CartController extends Controller
         $novoCarrinho = array(
             "name" => $carrinho->name,
             "client_id" => $carrinho->client_id,
+            "photos_select" => $carrinho->photos_select,
             "sent" => 0
         );
         $cartNew = Cart::create($novoCarrinho);
