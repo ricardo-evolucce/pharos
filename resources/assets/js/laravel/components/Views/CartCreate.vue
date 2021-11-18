@@ -397,15 +397,15 @@ export default {
     escolherFotosContinuar (isStart) {
       this.loading = true
       this.arrayFotosTab = []
-      this.selectedImages = []
+    //  this.selectedImages = []
 
       let ids = []
       this.profile_id = []
 
       if(this.cart_id){
-       // this.selectedImages = []
         this.getUserPhotosCarts(this.cart_id)
           .then(cart_select_photos => {
+            this.selectedImages = []
               for (const i in cart_select_photos) {
                   const fotos = cart_select_photos[i];
                   for (const j in fotos) {
