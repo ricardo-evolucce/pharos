@@ -15,7 +15,7 @@
           <!-- {{clients}} -->
           <!-- @csrf -->
           <!-- Vital Info -->
-          <h2 class="content-heading pt-0">Informações</h2>
+          <h2 class="content-heading pt-0">Informação</h2>
           <div class="row push">
             <div class="col-lg-4">
               <p class="text-muted">
@@ -466,7 +466,6 @@ export default {
       }
     },
     onselectmultipleimage (fotos) {
-      this.loading = true
 
       this.arrayFotosSelecionadasTabs = {}
       this.montarArrayFotosSelecionadas(fotos)
@@ -475,18 +474,18 @@ export default {
         this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, this.cart_id)
           .then(response=>{
             this.escolherFotosContinuar(false)
+
         }).catch(error=>{
             console.log("Error ao processar" + error)
         });
       }else{
         this.saveCart(this.arrayFotosSelecionadasSendTabs)
           .then(response=>{
-  
+
         }).catch(error=>{
             console.log("Error ao salvar" + error)
         });
       } 
-       this.loading = false
     },
     clickTab (profile) {
       this.tab.profile = profile
