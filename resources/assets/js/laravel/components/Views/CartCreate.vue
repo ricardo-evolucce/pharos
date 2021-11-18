@@ -132,7 +132,7 @@
                       >
                         <!-- {{arrayFotos}} -->
                         <!--{{arrayFotosSelecionadasTabs}}-->
-                        <!--{{selectedImages}} -->
+                        {{selectedImages}}
                         <!-- TABS -->
                         <nav>
                           <div
@@ -395,7 +395,7 @@ export default {
       }
     },
     escolherFotosContinuar (isStart) {
-     // this.loading = true
+      this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
 
@@ -403,7 +403,7 @@ export default {
       this.profile_id = []
 
       if(this.cart_id){
-        this.selectedImages = []
+       // this.selectedImages = []
         this.getUserPhotosCarts(this.cart_id)
           .then(cart_select_photos => {
               for (const i in cart_select_photos) {
@@ -411,11 +411,13 @@ export default {
                   for (const j in fotos) {
                     const foto = fotos[j];
                     this.selectedImages.push(this.fotoParaObjetoFoto(foto))
+                    console.log("this>>>>>" + JSON.stringify(this.selectedImages))
                   }
               }
           })
       }
-      console.log("this>>>>>" + JSON.stringify(this.selectedImages))
+
+      
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
@@ -447,7 +449,7 @@ export default {
           this.clickTab(this.tab.profile)
         }
       }).finally(() => {
-      //  this.loading = false
+        this.loading = false
       })
     },
 
@@ -471,7 +473,7 @@ export default {
       this.montarArrayFotosSelecionadas(fotos)
 
       if(this.cart_id){
-      //  this.loading = true
+        this.loading = true
 
         this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, this.cart_id)
           .then(response=>{
@@ -496,7 +498,7 @@ export default {
       this.exibirFotosTab()
     },
     exibirFotosTab () {
-    //  this.loading = true
+      this.loading = true
       this.arrayFotosTab = []
 
       let user_id = this.tab.profile.user_id
@@ -507,7 +509,7 @@ export default {
         let objeto = this.fotoParaObjetoFoto(foto)
         this.arrayFotosTab.push(objeto)
       }
-    //  this.loading = false
+      this.loading = false
     },
     pegarUserIdPelaFoto(foto){
       let user_id = "";
