@@ -395,7 +395,7 @@ export default {
       }
     },
     escolherFotosContinuar (isStart) {
-      this.loading = true
+     // this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
 
@@ -415,7 +415,7 @@ export default {
               }
           })
       }
-      
+      console.log("this>>>>>" + JSON.stringify(this.selectedImages))
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
@@ -447,7 +447,7 @@ export default {
           this.clickTab(this.tab.profile)
         }
       }).finally(() => {
-        this.loading = false
+      //  this.loading = false
       })
     },
 
@@ -471,7 +471,7 @@ export default {
       this.montarArrayFotosSelecionadas(fotos)
 
       if(this.cart_id){
-        this.loading = true
+      //  this.loading = true
 
         this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, this.cart_id)
           .then(response=>{
@@ -484,6 +484,7 @@ export default {
 
         this.saveCart(this.arrayFotosSelecionadasSendTabs)
           .then(response=>{
+            console.log("reposta ao salvar" + JSON.stringify(response))
 
         }).catch(error=>{
             console.log("Error ao salvar" + error)
@@ -495,7 +496,7 @@ export default {
       this.exibirFotosTab()
     },
     exibirFotosTab () {
-      this.loading = true
+    //  this.loading = true
       this.arrayFotosTab = []
 
       let user_id = this.tab.profile.user_id
@@ -506,7 +507,7 @@ export default {
         let objeto = this.fotoParaObjetoFoto(foto)
         this.arrayFotosTab.push(objeto)
       }
-      this.loading = false
+    //  this.loading = false
     },
     pegarUserIdPelaFoto(foto){
       let user_id = "";
