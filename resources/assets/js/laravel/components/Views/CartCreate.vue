@@ -15,7 +15,7 @@
           <!-- {{clients}} -->
           <!-- @csrf -->
           <!-- Vital Info -->
-          <h2 class="content-heading pt-0">Informação</h2>
+          <h2 class="content-heading pt-0">Informações</h2>
           <div class="row push">
             <div class="col-lg-4">
               <p class="text-muted">
@@ -471,6 +471,8 @@ export default {
       this.montarArrayFotosSelecionadas(fotos)
 
       if(this.cart_id){
+        this.loading = true
+
         this.addRemoveItemPhotoCart(this.arrayFotosSelecionadasSendTabs, this.cart_id)
           .then(response=>{
             this.escolherFotosContinuar(false)
@@ -479,6 +481,7 @@ export default {
             console.log("Error ao processar" + error)
         });
       }else{
+
         this.saveCart(this.arrayFotosSelecionadasSendTabs)
           .then(response=>{
 
@@ -574,6 +577,7 @@ export default {
         }).then(response => {
             this.cart_id = response.data.id
             resolve(response.data)
+
           })
           .catch(error => reject(error));
       })
