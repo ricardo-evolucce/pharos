@@ -132,7 +132,7 @@
                       >
                         <!-- {{arrayFotos}} -->
                         <!--{{arrayFotosSelecionadasTabs}}-->
-                        {{selectedImages}}
+                        <!-- {{selectedImages}} -->
                         <!-- TABS -->
                         <nav>
                           <div
@@ -394,71 +394,10 @@ export default {
         src: `${foto}`,
       }
     },
-    escolherFotosContinuar2 (isStart) {
-      this.loading = true
-      this.arrayFotosTab = []
-      this.selectedImages = []
-            let objeto_fotos = []
-
-      let ids = []
-      this.profile_id = []
-
-      if(this.cart_id){
-      //  this.selectedImages = []
-        this.getUserPhotosCarts(this.cart_id)
-          .then(cart_select_photos => {
-              for (const i in cart_select_photos) {
-                  const fotos = cart_select_photos[i];
-                  for (const j in fotos) {
-                    const foto = fotos[j];
-                    this.selectedImages.push(this.fotoParaObjetoFoto(foto))
-                    console.log("this cont>>>>>" + JSON.stringify(this.selectedImages))
-                  }
-              }
-          })
-      }
-
-      for (const key in this.new_cart) {
-        const profile = this.new_cart[key];
-        ids.push(profile.user_id)
-        this.profile_id.push(profile.id)
-      }
-
-      this.arrayFotos = {}
-      this.getUserPhotos(ids)
-          .then(perfis_fotos => {
-            this.arrayFotos = perfis_fotos
-            for (const i in perfis_fotos) {
-              const fotos = perfis_fotos[i];
-              for (const j in fotos) {
-                const foto = fotos[j];
-                objeto_fotos.push(this.fotoParaObjetoFoto(foto))
-                console.log("objsetos cont fotos>>>>>" + JSON.stringify(this.selectedImages))
-
-              }
-            }
-
-          if(this.cart_id){
-              this.montarArrayFotosSelecionadas(this.selectedImages)
-            }else{
-              this.selectedImages = objeto_fotos
-              this.montarArrayFotosSelecionadas(objeto_fotos)
-          }
-        if(isStart){
-          this.clickTab(this.new_cart[0])
-        } else{
-          this.clickTab(this.tab.profile)
-        }
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-
     escolherFotosContinuar (isStart) {
      this.loading = true
      this.arrayFotosTab = []
      this.selectedImages = []
-     this.arrayFotos = {}
 
       let ids = []
       this.profile_id = []
@@ -478,7 +417,6 @@ export default {
                 for (const j in fotos) {
                   const foto = fotos[j];
                   this.selectedImages.push(this.fotoParaObjetoFoto(foto))
-                  console.log("this>>>>>" + JSON.stringify(this.selectedImages))
                 }
             }
 
@@ -491,17 +429,17 @@ export default {
 
           if(isStart){
             this.clickTab(this.new_cart[0])
-          } else{
-            this.clickTab(this.tab.profile)
+            }else{
+              this.clickTab(this.tab.profile)
           }
         }).finally(() => {
           this.loading = false
         })
 
       }else{
-
-
+      
       this.arrayFotos = {}
+
       this.getUserPhotos(ids)
         .then(perfis_fotos => {
 
@@ -514,14 +452,12 @@ export default {
             }
           }
       
-          console.log("objetos fotos>>>>>" + JSON.stringify(this.selectedImages))
-
           this.montarArrayFotosSelecionadas(this.selectedImages)
 
           if(isStart){
             this.clickTab(this.new_cart[0])
-          } else{
-            this.clickTab(this.tab.profile)
+            }else{
+              this.clickTab(this.tab.profile)
           }
         }).finally(() => {
           this.loading = false
@@ -585,7 +521,7 @@ export default {
         let objeto = this.fotoParaObjetoFoto(foto)
         this.arrayFotosTab.push(objeto)
       }
-      this.loading = false
+     this.loading = false
     },
     pegarUserIdPelaFoto(foto){
       let user_id = "";
