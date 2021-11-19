@@ -403,22 +403,8 @@ export default {
       let ids = []
       this.profile_id = []
 
-      if(this.cart_id){
-      //  this.selectedImages = []
-        this.getUserPhotosCarts(this.cart_id)
-          .then(cart_select_photos => {
-              for (const i in cart_select_photos) {
-                  const fotos = cart_select_photos[i];
-                  for (const j in fotos) {
-                    const foto = fotos[j];
-                    this.selectedImages.push(this.fotoParaObjetoFoto(foto))
-                    console.log("this>>>>>" + JSON.stringify(this.selectedImages))
-                  }
-              }
-          })
-      }
 
-      
+
       for (const key in this.new_cart) {
         const profile = this.new_cart[key];
         ids.push(profile.user_id)
@@ -434,10 +420,27 @@ export default {
               for (const j in fotos) {
                 const foto = fotos[j];
                 objeto_fotos.push(this.fotoParaObjetoFoto(foto))
-                console.log("objsetos fotos>>>>>" + JSON.stringify(this.selectedImages))
+                console.log("objsetos cont fotos>>>>>" + JSON.stringify(this.selectedImages))
 
               }
             }
+
+
+      if(this.cart_id){
+      //  this.selectedImages = []
+        this.getUserPhotosCarts(this.cart_id)
+          .then(cart_select_photos => {
+              for (const i in cart_select_photos) {
+                  const fotos = cart_select_photos[i];
+                  for (const j in fotos) {
+                    const foto = fotos[j];
+                    this.selectedImages.push(this.fotoParaObjetoFoto(foto))
+                    console.log("this cont>>>>>" + JSON.stringify(this.selectedImages))
+                  }
+              }
+          })
+      }
+
 
           if(this.cart_id){
               this.montarArrayFotosSelecionadas(this.selectedImages)
