@@ -380,7 +380,7 @@ export default {
       this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
-      this.arrayFotos = {}
+      //  this.arrayFotos = {}
      
       let ids = []
       this.profile_id = []
