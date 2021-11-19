@@ -495,11 +495,12 @@ export default {
             console.log("Error ao processar" + error)
         });
       }else{
+        this.loading = true
+
 
         this.saveCart(this.arrayFotosSelecionadasSendTabs)
           .then(response=>{
-            console.log("reposta ao salvar" + JSON.stringify(response))
-
+            this.escolherFotosContinuar(false)
         }).catch(error=>{
             console.log("Error ao salvar" + error)
         });
