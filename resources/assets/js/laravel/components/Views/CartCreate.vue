@@ -398,6 +398,7 @@ export default {
       this.loading = true
       this.arrayFotosTab = []
       this.selectedImages = []
+            let objeto_fotos = []
 
       let ids = []
       this.profile_id = []
@@ -428,7 +429,6 @@ export default {
       this.getUserPhotos(ids)
           .then(perfis_fotos => {
             this.arrayFotos = perfis_fotos
-            let objeto_fotos = []
             for (const i in perfis_fotos) {
               const fotos = perfis_fotos[i];
               for (const j in fotos) {
