@@ -103,7 +103,7 @@
                                     </a>
                                 </div>
                                 <div class="btn-group">
-                                    <form action="{{ route('carts.delete') }}" method="POST" onSubmit="return confirm('Apagar carrinho?');">
+                                    <form action="{{ route('carts.deleteCartPending') }}" method="POST" onSubmit="return confirm('Apagar carrinho?');">
                                         @csrf
                                         <input type="hidden" name="id" value="{{$cart->id}}" />
                                         <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Apagar" data-placement="left">

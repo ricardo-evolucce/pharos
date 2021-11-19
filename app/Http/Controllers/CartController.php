@@ -493,6 +493,20 @@ class CartController extends Controller
             ->with('success', 'Carrinho excluido com sucesso!'); 
 
     }
+
+    public function deleteCartPending(Request $cart)
+    {
+        //obtem dados do carrinho
+        $carrinho = Cart::find($cart->id);  
+        $carrinho->delete();
+
+        Storage::disk('public')->deleteDirectory("/carts/{$cart->id}"); 
+        
+
+        return redirect()->route('carts.pendings')
+            ->with('success', 'Carrinho excluido com sucesso!'); 
+
+    }
     /**
      *  1 - Find no carrinho anterior
      *  2 - Adiciona ao array $profiles_id os id's para utilização do sync

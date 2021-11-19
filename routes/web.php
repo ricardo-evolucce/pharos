@@ -84,6 +84,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carts/{cart}/preview/{profile}', 'CartController@previewPDF')->name('profile.preview');
     Route::get('/carts/{cart}/send', 'CartController@sendCart')->name('carts.send');
     Route::post('/carts/delete', 'CartController@delete')->name('carts.delete');
+    Route::post('/carts/deleteCartPending', 'CartController@deleteCartPending')->name('carts.deleteCartPending');
     Route::post('/carts/{cart}/edit', 'CartController@edit')->name('carts.edit');
     Route::post('/carts/update/{cart}', 'CartController@update')->name('carts.update');
     Route::post('/carts/updateItemPhoto/{cart}', 'CartController@updateItemPhoto')->name('carts.updateItemPhoto');
