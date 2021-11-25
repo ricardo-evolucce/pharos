@@ -13,23 +13,22 @@ if (!function_exists('create_thumbnail')) {
 if (!function_exists('return_dimension')) {
     function return_dimension($image)
     {
-        $imageSize = getimagesize($image);
-        $width = $imageSize[0];
-        $height = $imageSize[1];
-        $widthNew = 250;
-        $heightNew = 250;
+        $width = 300; // your max width
+        $height = 300; // your max height
 
-        if($width > $height){
-            $widthNew = 250;
-            $heightNew = 167;
-        }else if($width < $height){
-            $widthNew = 185;
-            $heightNew = 300;
-        }
+        $img = Image::make($image);
+
+        $img->height() > $img->width() ? $width=null : $height=null;
+        
+        $img->resize($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+
         return array(
-            "width" => $widthNew,
-            "height" => $heightNew
+            "width" => $img->width(),
+            "height" => $img->height()
         );
+
     }
 }
 if (!function_exists('recurse_copy')) {
