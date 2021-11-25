@@ -36,7 +36,8 @@ class CartProfiles extends Mailable
     public function build()
     {
         $email = $this->view('emails.carts.profiles')->subject($this->cart->name);
-
+        $array_imgs = unserialize($this->cart->photos_select);
+         
         foreach ($this->cart->profiles as $profile) {
             $filename = str_slug($profile->user->name);
 
@@ -44,11 +45,10 @@ class CartProfiles extends Mailable
                 'as' => $profile->fancy_name . '.pdf',
             ]);
 
-            if ($firstMedia = $profile->medias->first()) {
-                $email->attach(public_path('/uploads/profiles/' . $profile->user_id . '/' . $firstMedia->path), [
-                    'as' => $profile->fancy_name . '.jpg',
-                ]);
-            }
+            $email->attach(public_path($array_imgs[$profile->user->id][0]["src"]), [
+                'as' => $profile->fancy_name . '.jpg',
+            ]);
+            
         }
 
         return $email;
