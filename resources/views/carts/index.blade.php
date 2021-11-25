@@ -129,7 +129,7 @@
                             <tr>
                                 <td class="text-center">
                                     @if ($profile->medias->first())
-                                        <img class="img-avatar img-avatar32" src="{{ asset('uploads/profiles/'. $profile->id . '/thumb/' . $profile->medias->first()->path) }}" alt="">
+                                        <img class="img-avatar img-avatar32" src="{{ asset('uploads/profiles/'. $profile->user_id . '/thumb/' . $profile->medias->first()->path) }}" alt="">
                                     @else
                                         <img class="img-avatar img-avatar32" src="https://api.adorable.io/avatars/48/{{$profile->user->email}}" alt="">
                                     @endif
