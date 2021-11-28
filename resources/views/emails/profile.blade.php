@@ -35,7 +35,7 @@
                     <tr>
                         @endif
                         <td style="width: 100%; text-align: center">
-                            <img src="{{$fotos_grupos[$i]}}">
+                            <img src="{{$fotos_grupos[$i]}}" style="max-width:200px; max-height: 300px">
                         </td>
                         @if($cont == 2)
                     </tr>

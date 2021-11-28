@@ -13,17 +13,16 @@ if (!function_exists('create_thumbnail')) {
 if (!function_exists('return_dimension')) {
     function return_dimension($image)
     {
-        $width = 300; // your max width
-        $height = 300; // your max height
+        $width = 600; // your max width
+        $height = 600; // your max height
 
         $img = Image::make($image);
-
         $img->height() > $img->width() ? $width=null : $height=null;
         
         $img->resize($width, $height, function ($constraint) {
             $constraint->aspectRatio();
         });
-
+        
         return array(
             "width" => $img->width(),
             "height" => $img->height()
