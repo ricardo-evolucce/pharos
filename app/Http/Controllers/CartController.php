@@ -121,7 +121,7 @@ class CartController extends Controller
      */
     public function storeCartDraft(Request $request)
     {
-        $errors = 0;
+        try {
             $dataCreate = array(
                 "photos_select" => serialize($request->get('fotos')),
                 "name" => $request->get('name'),
@@ -136,17 +136,20 @@ class CartController extends Controller
 
             $this->savePDFPhotos($cart, $request->get('fotos'));
 
-        if($errors > 0){
-            return response()->json([
-               'status' => 1,
-               'message'   =>'Ocorreu um erro ao salvar a imagem'
-            ]);
-        }else{
+
             return response()->json([
                 'status' => 3,
                 'id' => $cart->id
             ]);
+
+        }catch(Exception $e){
+            return response()->json([
+                'status' => 1,
+                'message'   =>'Ocorreu um erro ao salvar a imagem'
+            ]);
         }
+
+
     }
     public function store(Request $request)
     {
@@ -187,7 +190,6 @@ class CartController extends Controller
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
             $this->savePDFPhotos($cart, $request->get('fotos'));
-
             if ($request->action == 'create_send') {
                 $sendEmail = true;
                 if (!$this->send($cart)) {
@@ -406,11 +408,10 @@ class CartController extends Controller
                                   $imgCompress = ImgCompressPath::where('user_id', $profile->user_id)
                                                                 ->where('img_name', $dataPhoto[4])
                                                                 ->first();
-                                if($imgCompress == null){
+                               if($imgCompress == null){
                                       create_dir_comp($profile->user_id);
                                       $imgPath = "uploads/profiles/{$profile->user_id}/compress";
                                       $dimensions = return_dimension(public_path($fotos[$i]["src"]));
-
                                       $foto = create_thumbnail(public_path($fotos[$i]["src"]), $imgPath."/comp-".$dataPhoto[4], $dimensions["width"], $dimensions["height"]);
                                       array_push($fotos_grupos, $foto->dirname."/".$foto->basename);
                                       $imgCompress = array(
@@ -419,10 +420,10 @@ class CartController extends Controller
                                           "user_id" => $profile->user_id
                                       );
                                       ImgCompressPath::create($imgCompress);
-                                  }else{
+                                }else{
 
-                                    array_push($fotos_grupos, $imgCompress->url_compress);
-                                  }
+                                array_push($fotos_grupos, $imgCompress->url_compress);
+                                }
                             }
                         }
                         $foto_principal =  $fotos_grupos[0]; // foto principal
