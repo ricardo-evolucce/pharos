@@ -300,14 +300,14 @@ class CartController extends Controller
         // deleta diretório de pdf e imagens comprimidas
         $this->deletedirectoryCartProfile($cart);
         // cria um novo diretório
-        $this->savePDFPhotos($cart, $request->get('fotos'));
+        $foto_principal = $this->savePDFPhotos($cart, $request->get('fotos'));
       
         if(count($request->get('client_ids')) > 0){
             $this->createCartsClients($request);
         }
 
         if ($request->action == 'edit_send') {
-            if (!$this->send($cart)) {
+            if (!$this->send($cart, $foto_principal)) {
                 return response()->json([
                     'status' => 1,
                     'message'   =>'Ocorreu um erro ao enviar o pedido!'
