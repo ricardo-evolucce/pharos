@@ -189,10 +189,10 @@ class CartController extends Controller
             );
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
-            $foto_principal = $this->savePDFPhotos($cart, $request->get('fotos'));
+            $this->savePDFPhotos($cart, $request->get('fotos'));
             if ($request->action == 'create_send') {
                 $sendEmail = true;
-                if (!$this->send($cart, $foto_principal)) {
+                if (!$this->send($cart)) {
                     $errors++;
                     $sendEmail = false;
                 }
@@ -300,14 +300,14 @@ class CartController extends Controller
         // deleta diretório de pdf e imagens comprimidas
         $this->deletedirectoryCartProfile($cart);
         // cria um novo diretório
-        $foto_principal = $this->savePDFPhotos($cart, $request->get('fotos'));
+        $this->savePDFPhotos($cart, $request->get('fotos'));
       
         if(count($request->get('client_ids')) > 0){
             $this->createCartsClients($request);
         }
 
         if ($request->action == 'edit_send') {
-            if (!$this->send($cart, $foto_principal)) {
+            if (!$this->send($cart)) {
                 return response()->json([
                     'status' => 1,
                     'message'   =>'Ocorreu um erro ao enviar o pedido!'
@@ -334,10 +334,10 @@ class CartController extends Controller
 
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
-            $foto_principal = $this->savePDFPhotos($cart, $request->get('fotos'));
+            $this->savePDFPhotos($cart, $request->get('fotos'));
            
             if ($request->action == 'edit_send') {
-                if (!$this->send($cart, $foto_principal)) {
+                if (!$this->send($cart)) {
                     return response()->json([
                         'status' => 1,
                         'message'   =>'Ocorreu um erro ao enviar o pedido para a produtora!'
@@ -371,6 +371,7 @@ class CartController extends Controller
 
     public function sendCart(Cart $cart)
     {
+
         if (!$this->send($cart)) {
             return redirect()->route('carts.index')
                 ->with('warning', 'Ocorreu um erro ao enviar o pedido!');
@@ -429,7 +430,6 @@ class CartController extends Controller
                         $foto_principal =  $fotos_grupos[0]; // foto principal
                         unset($fotos_grupos[0]); // remove a primeira foto do array
                         PDF::loadView('emails.profile', compact('profile', 'foto_principal', 'fotos_grupos'))->setPaper('a4', 'landscape')->save("{$path}/{$name}.pdf");
-                        return $foto_principal;
                     }
                 }
 
@@ -464,12 +464,12 @@ class CartController extends Controller
         return response()->file("{$path}{$nameFile}.pdf");
     }
 
-    public function send(Cart $cart, $foto_principal)
+    public function send(Cart $cart)
     {
         // return new \App\Mail\CartProfiles($cart);
 
         try {
-            Mail::to($cart->client->user->email)->send(new CartProfiles($cart, $foto_principal));
+            Mail::to($cart->client->user->email)->send(new CartProfiles($cart));
 
             $cart->sent = true;
             $cart->save();
