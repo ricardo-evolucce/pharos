@@ -335,7 +335,7 @@ class CartController extends Controller
             $cart = Cart::create($dataCreate);
             $cart->profiles()->sync($request->profile_id);
             $foto_principal = $this->savePDFPhotos($cart, $request->get('fotos'));
-            dd($foto_principal);
+           
             if ($request->action == 'edit_send') {
                 if (!$this->send($cart, $foto_principal)) {
                     return response()->json([
