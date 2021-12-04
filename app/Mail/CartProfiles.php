@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Cart;
+use App\ImgCompressPath;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -36,7 +37,7 @@ class CartProfiles extends Mailable
     public function build()
     {
         $email = $this->view('emails.carts.profiles')->subject($this->cart->name);
-        $array_imgs = unserialize($this->cart->photos_select);
+        // $array_imgs = unserialize($this->cart->photos_select);
          
         foreach ($this->cart->profiles as $profile) {
             $filename = str_slug($profile->user->name);
@@ -45,9 +46,16 @@ class CartProfiles extends Mailable
                 'as' => $profile->fancy_name . '.pdf',
             ]);
 
-            $email->attach(public_path($array_imgs[$profile->user->id][0]["src"]), [
+            $imgCompress = ImgCompressPath::where('user_id', $profile->user_id)
+            ->first();
+
+            $email->attach(public_path($imgCompress->url_compress), [
                 'as' => $profile->fancy_name . '.jpg',
-            ]);        
+            ]);
+
+            // $email->attach(public_path($array_imgs[$profile->user->id][0]["src"]), [
+            //     'as' => $profile->fancy_name . '.jpg',
+            // ]);        
         }
 
         return $email;
