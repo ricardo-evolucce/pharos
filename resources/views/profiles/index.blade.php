@@ -52,10 +52,11 @@
                     <tbody>
                         @foreach($profiles->sortBy('fancy_name') as $profile)
                         <tr>
+                            {{-- {{dump($profile->medias)}} --}}
                             <td class="text-center">
                        
                                 @if ($profile->medias->first())
-                                <img class="img-avatar img-avatar48" src="{{ asset('public/uploads/profiles/'. $profile->user_id . '/' . $profile->medias->first()->path) }}" alt="">
+                                <img class="img-avatar img-avatar48" src="{{ asset('/uploads/profiles/'. $profile->user_id . '/' . $profile->medias->first()->path) }}" alt="">
                                 @else
                                 <img class="img-avatar img-avatar48" src="https://api.adorable.io/avatars/48/{{$profile->user->email}}" alt="">
                                 @endif

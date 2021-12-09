@@ -469,8 +469,8 @@
                                     <div class="media_list__delete" media_id="{{ base64_encode( $profile->user_id.'|'.$media->id ) }}">
                                         <i class="fa fa-trash" style=" color: #9f432c"></i>
                                     </div>
-                                    <a class="img-link img-link-simple img-lightbox" href="{{ url('public/uploads/profiles/' . $profile->user_id . '/' . $media->path) }}">
-                                        <img class="img-fluid" src="{{ url('public/uploads/profiles/' . $profile->user_id . '/' . $media->path) }}" alt="">
+                                    <a class="img-link img-link-simple img-lightbox" href="{{ url('/uploads/profiles/' . $profile->user_id . '/' . $media->path) }}">
+                                        <img class="img-fluid" src="{{ url('/uploads/profiles/' . $profile->user_id . '/' . $media->path) }}" alt="">
                                     </a>
                                 
                                     <!-- posição da foto na galeria no site -->
