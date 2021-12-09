@@ -203,7 +203,6 @@ class HelperController extends Controller
         ];
 
         $validator = Validator::make( $request->all() , $rules, $messages);
-
         if ($validator->fails()) {
             return response()->json([ 'error' => $validator->messages() ]);
         }
@@ -227,6 +226,20 @@ class HelperController extends Controller
         } else {
             Media::insert($data);
         }
+       
+
+        $image = 'uploads/profiles/'.$request->get('user_id').'/'.$imageName;
+
+        // open and resize an image file
+        $img = Image::make($image)->resize(200, 200);
+      
+        //CRIA DIRETÓRIO MINIATURA, CASO NAO EXISTA
+        if (!file_exists("uploads/profiles/".$request->get('user_id')."/thumb")) {
+            File::makeDirectory("uploads/profiles/".$request->get('user_id')."/thumb", 0775, true);
+        }
+
+        // save file as jpg with medium quality
+        $img->save('uploads/profiles/'.$request->get('user_id').'/thumb/'.$imageName, 60);
 
         $imgCompress = ImgCompressPath::where('user_id', $request->get('user_id'))
             ->where('img_name', $imageName)
@@ -270,7 +283,6 @@ class HelperController extends Controller
         ];
 
         $validator = Validator::make( $request->all() , $rules, $messages);
-
         if ($validator->fails()) {
             return response()->json([ 'error' => $validator->messages() ]);
         }
