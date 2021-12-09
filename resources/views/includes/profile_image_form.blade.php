@@ -15,8 +15,10 @@
                             <div class="media_list__delete" media_id="{{ base64_encode( $user->id.'|'.$val->id ) }}">
                                 <i class="fa fa-trash" style=" color: #9f432c"></i>
                             </div>
-                            <div class="media_list__background" style="background-image: url( '<?php echo url( '/uploads/profiles/' .$profile->user_id.'/'. $val['path'] ); ?>' );">
-                            </div>
+                            <div class="media_list__background" style="background-image:
+                            url( '<?php echo url( '/uploads/profiles/' .$val->entity_id.'/'. $val->path ); ?>' );">
+                           </div>
+    
                         </div>
                         @empty
                         <div class="media_list">
